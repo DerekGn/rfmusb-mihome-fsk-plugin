@@ -3,7 +3,7 @@
 # Author: DerekGn
 #
 """
-<plugin key="RfmEnergFsk" name="RfmUsb Energenie OOK" author="DerekGn" version="1.0.0" wikilink="http://www.domoticz.com/wiki/plugins/plugin.html" externallink="https://github.com/DerekGn/rfmusb-mihome-fsk-plugin">
+<plugin key="RfmEnergFsk" name="RfmUsb Energenie FSK" author="DerekGn" version="1.0.0" wikilink="http://www.domoticz.com/wiki/plugins/plugin.html" externallink="https://github.com/DerekGn/rfmusb-mihome-fsk-plugin">
     <description>
         <h2>RfmUsb Energenie Fsk Devices Plugin</h2>
         <br/>

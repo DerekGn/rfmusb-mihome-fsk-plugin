@@ -70,7 +70,8 @@
 """
 import Domoticz
 import OpenThings
-import Devices
+import AxioLogix
+import Energine
 
 
 class BasePlugin:
@@ -184,14 +185,9 @@ class BasePlugin:
         payload = bytearray(data.decode('hex'))
         try:
             message = OpenThings.decode(payload)
-            header = message["header"]
-            mfr_id = header["mfrid"]
-            product_id = header["productid"]
-            device_id = header["sensorid"]
-            address = (mfr_id, product_id, device_id)
+            self.handle_message(message)
         except OpenThings.OpenThingsException:
             Domoticz.Error("Unable to decode payload:%s" % payload)
-        self.handle_message(message)
 
     def HandleMessage(self, message):
         for rec in message["recs"]:
@@ -216,19 +212,39 @@ class BasePlugin:
         header = message["header"]
         sensorId = header["sensorid"]
         productId = header["productid"]
-
-        if(productId == Devices.PRODUCTID_MIHO032):
-            Domoticz.Log("Adding Motion Sensor Id: " + str(sensorId))
-        elif(productId == Devices.PRODUCTID_MIHO033):
-            Domoticz.Log("Adding Door Sensor Id: " + str(sensorId))
-        elif(productId == Devices.PRODUCTID_TEMPHUMIDITY):
-            Domoticz.Log("Adding Temp Humidity Sensor Id: " + str(sensorId))
-        elif(productId == Devices.PRODUCTID_AQS):
-            Domoticz.Log("Adding Aqs Sensor Id: " + str(sensorId))
-        elif(productId == Devices.PRODUCTID_EM):
-            Domoticz.Log("Adding Energy Meter Id: " + str(sensorId))
+        manufacturerId = header["mfrid"]
+        address = (manufacturerId, productId, sensorId)
+        if(manufacturerId == Energine.MFRID_ENERGENIE):
+            self.AddEnergineDevice(address, sensorId, productId)
+        elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
+            self.AddAxioLogixDevice(address, sensorId, productId)
         else:
-            Domoticz.Error("Unknown Sensor Id: " + str(sensorId) + " Product Id: " + str(productId))
+            Domoticz.Error("Unknown Sensor Id: " +
+                           str(sensorId) + " Product Id: " + str(productId))
+
+    def AddEnergineDevice(self, address, sensorId, productId):
+        if(productId == Energine.PRODUCTID_MIHO032):
+            Domoticz.Log("Creating Motion Sensor Id: " + str(sensorId))
+            Domoticz.Device(Name="Motion Sensor", Unit=address,
+                            TypeName="Switch", Type=244, Subtype=62, Switchtype=8).Create()
+        elif(productId == Energine.PRODUCTID_MIHO033):
+            Domoticz.Log("Creating Door Sensor Id: " + str(sensorId))
+            Domoticz.Device(Name="Door Sensor", Unit=address,
+                            TypeName="Switch", Type=244, Subtype=73, Switchtype=11).Create()
+
+    def AddAxioLogixDevice(self, address, sensorId, productId):
+        if(productId == AxioLogix.PRODUCTID_TEMPHUMIDITY):
+            Domoticz.Log("Creating Temp Humidity Sensor Id: " + str(sensorId))
+            Domoticz.Device(Name="Temp Humidity Sensor", Unit=address,
+                            TypeName="Temp+Hum", Type=82).Create()
+        elif(productId == Energine.PRODUCTID_AQS):
+            Domoticz.Log("Creating Aqs Sensor Id: " + str(sensorId))
+            Domoticz.Device(Name="Air Quality Sensor", Unit=address,
+                            TypeName="Air Quality", Type=249).Create()
+        # elif(productId == Energine.PRODUCTID_EM):
+        #     Domoticz.Log("Creating Energy Meter Id: " + str(sensorId))
+        #     
+
 
 global _plugin
 _plugin = BasePlugin()

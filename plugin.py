@@ -69,6 +69,9 @@
 </plugin>
 """
 import Domoticz
+import OpenThings
+import Devices
+
 
 class BasePlugin:
 
@@ -77,30 +80,37 @@ class BasePlugin:
     COMMAND_RESULT_OK = "OK"
 
     InitCommands = [
+        "e-r",
+        "s-mt 0",
+        "s-fd 0x01EC",
+        "s-f 434300000",
+        "s-rxbw 14",
+        "s-br 4800",
+        "s-ss 1",
+        "s-se 1",
+        "s-sbe 0",
+        "s-sync 2DD4",
+        "s-pf 0",
+        "s-dfe 1",
+        "s-cc 0",
+        "s-caco 0",
+        "s-af 0",
+        "s-pl 66",
+        "s-dio 0 1",
+        "s-di 1"
     ]
 
     LastCommand = ""
     CommandIndex = 0
     SerialConn = None
     IsInitalised = False
+    FifoRead = False
 
     def __init__(self):
         return
 
     def onStart(self):
-
-        deviceCount = len(Devices)
-
-        # # Can have up too 5 switches per home address, Switch ALL, 1, 2, 3, 4
-        # if(deviceCount < len(homeAddresses) * 5):
-        #     Domoticz.Log("Creating Devices")
-        #     self.AddDevices(len(homeAddresses))
-        #     Domoticz.Log("Created "+str(len(Devices) - deviceCount)+" Devices")
-
-        # for Device in Devices:
-        #     Devices[Device].Update(
-        #         nValue=Devices[Device].nValue, sValue=Devices[Device].sValue)
-
+        OpenThings.init(0)
         SerialConn = Domoticz.Connection(Name="Serial Connection", Transport="Serial",
                                          Protocol="None", Address=Parameters["SerialPort"], Baud=115200)
         SerialConn.Connect()
@@ -130,6 +140,26 @@ class BasePlugin:
         Domoticz.Log(
             "Command Executed: ["+self.LastCommand+"] Respose: ["+strData+"] ")
 
+        if(self.IsInitalised == False and self.LastCommand.startswith("s-op")):
+            self.IsInitalised = True
+
+        if(self.IsInitalised == False):
+            if(self.CommandIndex < len(self.InitCommands)):
+                self.SendCommand(self.InitCommands[self.CommandIndex])
+                self.CommandIndex = self.CommandIndex + 1
+            else:
+                # Append setting of power command to initalisation
+                self.SendCommand("s-op " + str(Parameters["Mode4"]))
+
+        if(strData.startswith("DIO PIN IRQ")):
+            # Read the FIFO
+            self.SendCommand("g-fifo")
+            self.FifoRead = True
+
+        if(self.FifoRead == True):
+            # Decode the fifo data
+            self.DecodeAndProcessFifoData(strData)
+
     def onCommand(self, Unit, Command, Level, Hue):
         Domoticz.Log("onCommand called for Unit " + str(Unit) +
                      ": Parameter '" + str(Command) + "', Level: " + str(Level))
@@ -149,6 +179,56 @@ class BasePlugin:
     def SendCommand(self, Command):
         self.LastCommand = Command
         self.SerialConn.Send(Command + "\n")
+
+    def DecodeAndProcessFifoData(self, data):
+        payload = bytearray(data.decode('hex'))
+        try:
+            message = OpenThings.decode(payload)
+            header = message["header"]
+            mfr_id = header["mfrid"]
+            product_id = header["productid"]
+            device_id = header["sensorid"]
+            address = (mfr_id, product_id, device_id)
+        except OpenThings.OpenThingsException:
+            Domoticz.Error("Unable to decode payload:%s" % payload)
+        self.handle_message(message)
+
+    def HandleMessage(self, message):
+        for rec in message["recs"]:
+            paramid = rec["paramid"]
+            if paramid == OpenThings.PARAM_JOIN:
+                self.HandleSensorJoin(message)
+
+    def HandleSensorJoin(self, message):
+        header = message["header"]
+        sensorId = header["sensorid"]
+        Domoticz.Log("Join Message From SensorId '"+str(sensorId)+"'.")
+        device = self.FindDevice(sensorId)
+        if(device is None):
+            self.AddDevice(message)
+
+    def FindDevice(self, sensorId):
+        for x in Devices:
+            if(Devices[x].ID == sensorId):
+                return Devices[x]
+
+    def AddDevice(self, message):
+        header = message["header"]
+        sensorId = header["sensorid"]
+        productId = header["productid"]
+
+        if(productId == Devices.PRODUCTID_MIHO032):
+            Domoticz.Log("Adding Motion Sensor Id: " + str(sensorId))
+        elif(productId == Devices.PRODUCTID_MIHO033):
+            Domoticz.Log("Adding Door Sensor Id: " + str(sensorId))
+        elif(productId == Devices.PRODUCTID_TEMPHUMIDITY):
+            Domoticz.Log("Adding Temp Humidity Sensor Id: " + str(sensorId))
+        elif(productId == Devices.PRODUCTID_AQS):
+            Domoticz.Log("Adding Aqs Sensor Id: " + str(sensorId))
+        elif(productId == Devices.PRODUCTID_EM):
+            Domoticz.Log("Adding Energy Meter Id: " + str(sensorId))
+        else:
+            Domoticz.Error("Unknown Sensor Id: " + str(sensorId) + " Product Id: " + str(productId))
 
 global _plugin
 _plugin = BasePlugin()

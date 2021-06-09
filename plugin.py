@@ -213,38 +213,45 @@ class BasePlugin:
         sensorId = header["sensorid"]
         productId = header["productid"]
         manufacturerId = header["mfrid"]
-        address = (manufacturerId, productId, sensorId)
+
         if(manufacturerId == Energine.MFRID_ENERGENIE):
-            self.AddEnergineDevice(address, sensorId, productId)
+            self.CreateEnergineDevice(sensorId, productId)
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
-            self.AddAxioLogixDevice(address, sensorId, productId)
+            self.CreateAxioLogixDevice(sensorId, productId)
         else:
             Domoticz.Error("Unknown Sensor Id: " +
                            str(sensorId) + " Product Id: " + str(productId))
 
-    def AddEnergineDevice(self, address, sensorId, productId):
+    def CreateEnergineDevice(self, sensorId, productId):
         if(productId == Energine.PRODUCTID_MIHO032):
             Domoticz.Log("Creating Motion Sensor Id: " + str(sensorId))
-            Domoticz.Device(Name="Motion Sensor", Unit=address,
-                            TypeName="Switch", Type=244, Subtype=62, Switchtype=8).Create()
+            Domoticz.Device(Name="Motion Sensor", DeviceID=sensorId, Unit=1,
+                            TypeName="Switch", Type=244, Subtype=62, Switchtype=8,
+                            Description="MIHO032 Infra red Motion Sensor").Create()
         elif(productId == Energine.PRODUCTID_MIHO033):
             Domoticz.Log("Creating Door Sensor Id: " + str(sensorId))
-            Domoticz.Device(Name="Door Sensor", Unit=address,
-                            TypeName="Switch", Type=244, Subtype=73, Switchtype=11).Create()
+            Domoticz.Device(Name="Door Sensor",  DeviceID=sensorId, Unit=1,
+                            TypeName="Switch", Type=244, Subtype=73, Switchtype=11,
+                            Description="MIHO033 Door Sensor").Create()
 
-    def AddAxioLogixDevice(self, address, sensorId, productId):
+    def CreateAxioLogixDevice(self, sensorId, productId):
         if(productId == AxioLogix.PRODUCTID_TEMPHUMIDITY):
             Domoticz.Log("Creating Temp Humidity Sensor Id: " + str(sensorId))
-            Domoticz.Device(Name="Temp Humidity Sensor", Unit=address,
-                            TypeName="Temp+Hum", Type=82).Create()
+            Domoticz.Device(Name="Temp Humidity Sensor",  DeviceID=sensorId, Unit=1,
+                            TypeName="Temp+Hum", Type=82,
+                            Description="RfmTemp Sensor").Create()
         elif(productId == Energine.PRODUCTID_AQS):
             Domoticz.Log("Creating Aqs Sensor Id: " + str(sensorId))
-            Domoticz.Device(Name="Air Quality Sensor", Unit=address,
-                            TypeName="Air Quality", Type=249).Create()
+            Domoticz.Device(Name="AQS", DeviceID=sensorId, Unit=1,
+                            TypeName="Air Quality VOC", Type=243, SubType=31, 
+                            Options={'Custom': '1;VOC Index'},
+                            Description="RfmTemp AQS").Create()
+            Domoticz.Device(Name="AQS Temp & Humidity", DeviceId=sensorId, Unit=2,
+                            TypeName="Temp+Hum", Type=82,
+                            Description="RfmTemp AQS Temp & Humidity").Create()
         # elif(productId == Energine.PRODUCTID_EM):
         #     Domoticz.Log("Creating Energy Meter Id: " + str(sensorId))
-        #     
-
+        #
 
 global _plugin
 _plugin = BasePlugin()

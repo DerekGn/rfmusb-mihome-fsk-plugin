@@ -60,7 +60,7 @@ PRODUCTID_MIHO033                 = 0x0D # FSK: Open sensor
 CRYPT_PID                        = 242
 CRYPT_PIP                        = 0x0100
 
-def CreateEnergineDevice(sensorId, productId):
+def CreateDevice(sensorId, productId):
     if(productId == PRODUCTID_MIHO032):
         Domoticz.Log("Creating Motion Sensor Id: " + str(sensorId))
         Domoticz.Device(Name="Motion Sensor", DeviceID=sensorId, Unit=1,
@@ -75,7 +75,7 @@ def CreateEnergineDevice(sensorId, productId):
 def UpdateDevice(device, productId, message):
     if(productId == PRODUCTID_MIHO032):
         motionRecord = Common.FindRecord(message, OpenThings.PARAM_MOTION_DETECTOR)
-        Devices[1].Update(nValue=int(motionRecord["value"]))
+        device[1].Update(nValue=int(motionRecord["value"]))
     elif(productId == PRODUCTID_MIHO033):
         doorRecord = Common.FindRecord(message, OpenThings.PARAM_DOOR_SENSOR)
-        Devices[1].Update(nValue=int(doorRecord["value"]))
+        device[1].Update(nValue=int(doorRecord["value"]))

@@ -7,13 +7,14 @@ import Domoticz
 import Energine
 import OpenThings
 
-MFRID_AXIOLOGIX                  = 0x55
+MFRID_AXIOLOGIX = 0x55
 
-PRODUCTID_TEMPHUMIDITY           = 0x01
-PRODUCTID_AQS                    = 0x02
-PRODUCTID_EM                     = 0x03
+PRODUCTID_TEMPHUMIDITY = 0x01
+PRODUCTID_AQS = 0x02
+PRODUCTID_EM = 0x03
 
-def CreateAxioLogixDevice(sensorId, productId):
+
+def CreateDevice(sensorId, productId):
     if(productId == PRODUCTID_TEMPHUMIDITY):
         Domoticz.Log("Creating Temp Humidity Sensor Id: " + str(sensorId))
         Domoticz.Device(Name="Temp Humidity Sensor", DeviceID=sensorId, Unit=1,
@@ -39,13 +40,14 @@ def CreateAxioLogixDevice(sensorId, productId):
                         Options={'Custom': '1;Hz'},
                         Description="Line Voltage Frequency").Create()
 
-        CreateRfmEmLineMeasurements('L', sensorId, 3)
+        CreateLineMeasurements('L', sensorId, 3)
 
-        CreateRfmEmLineMeasurements('n', sensorId, 9)
+        CreateLineMeasurements('n', sensorId, 9)
 
-        CreateRfmEmEnergyMeasurements(sensorId, 15)
+        CreateEnergyMeasurements(sensorId, 15)
 
-def CreateRfmEmLineMeasurements(self, line, sensorId, unit):
+
+def CreateLineMeasurements(line, sensorId, unit):
     Domoticz.Device(Name="Energy Meter " + line + " Current", DeviceID=sensorId, Unit=unit,
                     Type=243, Subtype=31,
                     Options={'Custom': '1;Irms'},
@@ -70,7 +72,8 @@ def CreateRfmEmLineMeasurements(self, line, sensorId, unit):
                     Options={'Custom': '1;kVA'},
                     Description=line + " Line Mean Apparent Power").Create()
 
-def CreateRfmEmEnergyMeasurements(self, sensorId, unit):
+
+def CreateEnergyMeasurements(sensorId, unit):
     Domoticz.Device(Name="Energy Meter Absolute Active Energy", DeviceID=sensorId, Unit=unit,
                     Type=243, Subtype=28,
                     Description="Energy Meter Absolute Active Energy").Create()
@@ -90,10 +93,113 @@ def CreateRfmEmEnergyMeasurements(self, sensorId, unit):
                     Type=243, Subtype=28,
                     Description="Energy Meter Reverse Reactive Energy").Create()
 
-def UpdateDevice(device, productId, message):
-    parameterId = record["paramid"]
 
+def UpdateDevice(device, productId, message):
     if(productId == PRODUCTID_TEMPHUMIDITY):
-        temperatureRecord = Common.FindRecord(message, OpenThings.PARAM_TEMPERATURE)
-        batteryRecord = Common.FindRecord(message, OpenThings.PARAM_BATTERY_LEVEL)
-        humidityRecord = Common.FindRecord(message, OpenThings.PARAM_TEMPERATURE)
+        temperatureRecord = Common.FindRecord(
+            message, OpenThings.PARAM_TEMPERATURE)
+        batteryRecord = Common.FindRecord(
+            message, OpenThings.PARAM_BATTERY_LEVEL)
+        humidityRecord = Common.FindRecord(
+            message, OpenThings.PARAM_RELATIVE_HUMIDITY)
+
+        humidity = ((125.0 * humidityRecord["value"]) / 65536.0) - 6
+
+        temperature = ((175.72 * temperatureRecord["value"]) / 65536.0) - 46.85
+
+        device[1].Update(nValue=0, sValue=temperature + ";" +
+                         humidity, BatteryLevel=batteryRecord["value"])
+    elif(productId == PRODUCTID_AQS):
+        temperatureRecord = Common.FindRecord(
+            message, OpenThings.PARAM_TEMPERATURE)
+        batteryRecord = Common.FindRecord(
+            message, OpenThings.PARAM_BATTERY_LEVEL)
+        humidityRecord = Common.FindRecord(
+            message, OpenThings.PARAM_RELATIVE_HUMIDITY)
+        vocRecord = Common.FindRecord(
+            message, OpenThings.PARAM_VOC_INDEX)
+
+        humidity = humidityRecord["value"] * 0.001
+
+        temperature = temperatureRecord["value"] * 0.001
+
+        batteryLevel = batteryRecord["value"]
+
+        device[1].Update(nValue=0, sValue=vocRecord["value"],
+                         BatteryLevel=batteryLevel)
+        device[2].Update(nValue=0, sValue=temperature + ";" +
+                         humidity, BatteryLevel=batteryRecord["value"])
+    elif(productId == PRODUCTID_EM):
+        voltageRecord = Common.FindRecord(message, OpenThings.PARAM_VOLTAGE)
+        freqRecord = Common.FindRecord(message, OpenThings.PARAM_FREQUENCY)
+
+        device[1].Update(sValue=voltageRecord["value"] / 100.0)
+        device[2].Update(nValue=freqRecord["value"] / 100.0)
+
+        iRecord_L = Common.FindRecord(message, OpenThings.PARAM_CURRENT_L)
+        phaseRecord_L = Common.FindRecord(
+            message, OpenThings.PARAM_PHASE_ANGLE_L)
+        activePowerRecord_L = Common.FindRecord(
+            message, OpenThings.PARAM_ACTIVE_POWER_L)
+        powerFactorRecord_L = Common.FindRecord(
+            message, OpenThings.PARAM_POWER_FACTOR_L)
+        reactivePowerRecord_L = Common.FindRecord(
+            message, OpenThings.PARAM_REACTIVE_POWER_L)
+        apparentPowerRecord_L = Common.FindRecord(
+            message, OpenThings.PARAM_APPARENT_POWER_L)
+
+        UpdateLineMeasurements(device, iRecord_L, phaseRecord_L, activePowerRecord_L,
+                               powerFactorRecord_L, reactivePowerRecord_L, apparentPowerRecord_L, 3)
+
+        iRecord_N = Common.FindRecord(message, OpenThings.PARAM_CURRENT_N)
+        phaseRecord_N = Common.FindRecord(
+            message, OpenThings.PARAM_PHASE_ANGLE_N)
+        activePowerRecord_N = Common.FindRecord(
+            message, OpenThings.PARAM_ACTIVE_POWER_N)
+        powerFactorRecord_N = Common.FindRecord(
+            message, OpenThings.PARAM_POWER_FACTOR_N)
+        reactivePowerRecord_N = Common.FindRecord(
+            message, OpenThings.PARAM_REACTIVE_POWER_N)
+        apparentPowerRecord_N = Common.FindRecord(
+            message, OpenThings.PARAM_APPARENT_POWER_N)
+
+        UpdateLineMeasurements(device, iRecord_N, phaseRecord_N, activePowerRecord_N,
+                               powerFactorRecord_N, reactivePowerRecord_N, apparentPowerRecord_N, 9)
+
+        UpdateEnergyMeasurements(device, message)
+
+
+def UpdateLineMeasurements(device, currentRecord, phaseRecord, activePowerRecord,
+                           powerFactorRecord, reactivePowerRecord, apparentPowerRecord, unit):
+    # Current
+    device[unit].Update(nValue=currentRecord["value"] / 1000.0)
+    # Phase
+    device[++unit].Update(nValue=phaseRecord["value"] / 10.0)
+    # Mean Active Power
+    device[++unit].Update(nValue=activePowerRecord["value"] / 1000.0)
+    # Mean Reactive Power
+    device[++unit].Update(nValue=reactivePowerRecord["value"] / 1000.0)
+    # Power Factor
+    device[++unit].Update(nValue=powerFactorRecord["value"] / 1000.0)
+    # Apparent Power
+    device[++unit].Update(nValue=apparentPowerRecord["value"] / 1000.0)
+
+def UpdateEnergyMeasurements(device, message):
+    # Absolute Active Energy
+    activeEnergy = Common.FindRecord(message, OpenThings.PARAM_ABS_ACTIVE_ENERGY)
+    device[15].Update(nValue=activeEnergy["Value"])
+    # Absolute Reactive Energy
+    reactiveEnergy = Common.FindRecord(message, OpenThings.PARAM_ABS_REACTIVE_ENERGY)
+    device[16].Update(nValue=reactiveEnergy["Value"])
+    # Forward Active Energy
+    fwdActiveEnergy = Common.FindRecord(message, OpenThings.PARAM_FWD_ACTIVE_ENERGY)
+    device[17].Update(nValue=fwdActiveEnergy["Value"])
+    # Forward Reactive Energy
+    fwdReactiveEnergy = Common.FindRecord(message, OpenThings.PARAM_FWD_REACTIVE_ENERGY)
+    device[18].Update(nValue=fwdReactiveEnergy["Value"])
+    # Reverse Active Energy
+    revActiveEnergy = Common.FindRecord(message, OpenThings.PARAM_REV_ACTIVE_ENERGY)
+    device[19].Update(nValue=revActiveEnergy["Value"])
+    # Reverse Reactive Energy
+    revReactiveEnergy = Common.FindRecord(message, OpenThings.PARAM_REV_REACTIVE_ENERGY)
+    device[20].Update(nValue=revReactiveEnergy["Value"])

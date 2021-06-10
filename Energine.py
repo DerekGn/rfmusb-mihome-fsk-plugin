@@ -3,6 +3,10 @@
 # Author: DerekGn
 #
 
+import OpenThings
+import Domoticz
+import Common
+
 MFRID_ENERGENIE                  = 0x04
 
 ##PRODUCTID_MIHO001                      # Home Hub
@@ -55,3 +59,23 @@ PRODUCTID_MIHO033                 = 0x0D # FSK: Open sensor
 # Default keys for OpenThings encryption and decryption
 CRYPT_PID                        = 242
 CRYPT_PIP                        = 0x0100
+
+def CreateEnergineDevice(sensorId, productId):
+    if(productId == PRODUCTID_MIHO032):
+        Domoticz.Log("Creating Motion Sensor Id: " + str(sensorId))
+        Domoticz.Device(Name="Motion Sensor", DeviceID=sensorId, Unit=1,
+                        TypeName="Switch", Type=244, Subtype=62, Switchtype=8,
+                        Description="MIHO032 Infra red Motion Sensor").Create()
+    elif(productId == PRODUCTID_MIHO033):
+        Domoticz.Log("Creating Door Sensor Id: " + str(sensorId))
+        Domoticz.Device(Name="Door Sensor", DeviceID=sensorId, Unit=1,
+                        TypeName="Switch", Type=244, Subtype=73, Switchtype=11,
+                        Description="MIHO033 Door Sensor").Create()
+
+def UpdateDevice(device, productId, message):
+    if(productId == PRODUCTID_MIHO032):
+        motionRecord = Common.FindRecord(message, OpenThings.PARAM_MOTION_DETECTOR)
+        Devices[1].Update(nValue=int(motionRecord["value"]))
+    elif(productId == PRODUCTID_MIHO033):
+        doorRecord = Common.FindRecord(message, OpenThings.PARAM_DOOR_SENSOR)
+        Devices[1].Update(nValue=int(doorRecord["value"]))

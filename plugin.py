@@ -72,7 +72,7 @@ import Domoticz
 import OpenThings
 import AxioLogix
 import Energine
-
+import Common
 
 class BasePlugin:
 
@@ -190,126 +190,41 @@ class BasePlugin:
             Domoticz.Error("Unable to decode payload:%s" % payload)
 
     def HandleMessage(self, message):
-        for rec in message["recs"]:
-            paramid = rec["paramid"]
-            if paramid == OpenThings.PARAM_JOIN:
-                self.HandleSensorJoin(message)
-
-    def HandleSensorJoin(self, message):
         header = message["header"]
         sensorId = header["sensorid"]
-        Domoticz.Log("Join Message From SensorId '"+str(sensorId)+"'.")
+        productId = header["productid"]
+        manufacturerId = header["mfrid"]
+        
         device = self.FindDevice(sensorId)
+
         if(device is None):
-            self.AddDevice(message)
+            join = Common.FindRecord(message, OpenThings.PARAM_JOIN)
+            if(join is not None):
+                Domoticz.Log("Join Message From SensorId: "+str(sensorId))
+                self.AddDevice(manufacturerId, sensorId, productId)
+        else:
+            Domoticz.Log("Updating Device SensorId: "+str(sensorId))
+            self.UpdateDevice(manufacturerId, productId, device, message)
 
     def FindDevice(self, sensorId):
         for x in Devices:
             if(Devices[x].ID == sensorId):
                 return Devices[x]
 
-    def AddDevice(self, message):
-        header = message["header"]
-        sensorId = header["sensorid"]
-        productId = header["productid"]
-        manufacturerId = header["mfrid"]
-
+    def AddDevice(self, manufacturerId, sensorId, productId):
         if(manufacturerId == Energine.MFRID_ENERGENIE):
-            self.CreateEnergineDevice(sensorId, productId)
+            Energine.CreateEnergineDevice(sensorId, productId)
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
-            self.CreateAxioLogixDevice(sensorId, productId)
+            AxioLogix.CreateAxioLogixDevice(sensorId, productId)
         else:
             Domoticz.Error("Unknown Sensor Id: " +
                            str(sensorId) + " Product Id: " + str(productId))
-
-    def CreateEnergineDevice(self, sensorId, productId):
-        if(productId == Energine.PRODUCTID_MIHO032):
-            Domoticz.Log("Creating Motion Sensor Id: " + str(sensorId))
-            Domoticz.Device(Name="Motion Sensor", DeviceID=sensorId, Unit=1,
-                            TypeName="Switch", Type=244, Subtype=62, Switchtype=8,
-                            Description="MIHO032 Infra red Motion Sensor").Create()
-        elif(productId == Energine.PRODUCTID_MIHO033):
-            Domoticz.Log("Creating Door Sensor Id: " + str(sensorId))
-            Domoticz.Device(Name="Door Sensor",  DeviceID=sensorId, Unit=1,
-                            TypeName="Switch", Type=244, Subtype=73, Switchtype=11,
-                            Description="MIHO033 Door Sensor").Create()
-
-    def CreateAxioLogixDevice(self, sensorId, productId):
-        if(productId == AxioLogix.PRODUCTID_TEMPHUMIDITY):
-            Domoticz.Log("Creating Temp Humidity Sensor Id: " + str(sensorId))
-            Domoticz.Device(Name="Temp Humidity Sensor",  DeviceID=sensorId, Unit=1,
-                            TypeName="Temp+Hum", Type=82,
-                            Description="RfmTemp Sensor").Create()
-        elif(productId == Energine.PRODUCTID_AQS):
-            Domoticz.Log("Creating Aqs Sensor Id: " + str(sensorId))
-            Domoticz.Device(Name="AQS", DeviceID=sensorId, Unit=1,
-                            Type=243, Subtype=31,
-                            Options={'Custom': '1;VOC Index'},
-                            Description="RfmAqs Sensor").Create()
-            Domoticz.Device(Name="AQS Temp & Humidity", DeviceId=sensorId, Unit=2,
-                            TypeName="Temp+Hum", Type=82,
-                            Description="RfmAqs Temp & Humidity").Create()
-        elif(productId == Energine.PRODUCTID_EM):
-            Domoticz.Log("Creating Energy Meter Id: " + str(sensorId))
-            Domoticz.Device(Name="Energy Meter Voltage", DeviceID=sensorId, Unit=1,
-                            Type=243, Subtype=31,
-                            Options={'Custom': '1;VAC'},
-                            Description="Rms Voltage").Create()
-            Domoticz.Device(Name="Energy Meter Frequency", DeviceID=sensorId, Unit=2,
-                            Type=243, Subtype=31,
-                            Options={'Custom': '1;Hz'},
-                            Description="Line Voltage Frequency").Create()
-
-            self.CreateRfmEmLineMeasurements('L', sensorId, 3)
-
-            self.CreateRfmEmLineMeasurements('n', sensorId, 9)
-
-            self.CreateRfmEmEnergyMeasurements(sensorId, 15)
-
-    def CreateRfmEmLineMeasurements(self, line, sensorId, unit):
-        Domoticz.Device(Name="Energy Meter " + line + " Current", DeviceID=sensorId, Unit=unit,
-                        Type=243, Subtype=31,
-                        Options={'Custom': '1;Irms'},
-                        Description=line + " Line Rms Current").Create()
-        Domoticz.Device(Name="Energy Meter " + line + " Phase", DeviceID=sensorId, Unit=++unit,
-                        Type=243, Subtype=31,
-                        Options={'Custom': '1;°'},
-                        Description="Phase Angle between Voltage and " + line + " Line Current").Create()
-        Domoticz.Device(Name="Energy Meter " + line + " PMean", DeviceID=sensorId, Unit=++unit,
-                        Type=243, Subtype=31,
-                        Options={'Custom': '1;kW'},
-                        Description=line + " Line Mean Active Power").Create()
-        Domoticz.Device(Name="Energy Meter " + line + " QMean", DeviceID=sensorId, Unit=++unit,
-                        Type=243, Subtype=31,
-                        Options={'Custom': '1;kvar'},
-                        Description=line + " Line Mean Reactive Power").Create()
-        Domoticz.Device(Name="Energy Meter " + line + "Power Factor", DeviceID=sensorId, Unit=++unit,
-                        Type=243, Subtype=31,
-                        Description=line + " Line Power Factor").Create()
-        Domoticz.Device(Name="Energy Meter " + line + " SMean", DeviceID=sensorId, Unit=++unit,
-                        Type=243, Subtype=31,
-                        Options={'Custom': '1;kVA'},
-                        Description=line + " Line Mean Apparent Power").Create()
-
-    def CreateRfmEmEnergyMeasurements(self, sensorId, unit):
-        Domoticz.Device(Name="Energy Meter Absolute Active Energy", DeviceID=sensorId, Unit=unit,
-                        Type=243, Subtype=28,
-                        Description="Energy Meter Absolute Active Energy").Create()
-        Domoticz.Device(Name="Energy Meter Absolute Reactive Energy", DeviceID=sensorId, Unit=++unit,
-                        Type=243, Subtype=28,
-                        Description="Energy Meter Absolute Reactive Energy").Create()
-        Domoticz.Device(Name="Energy Meter Forward Active Energy", DeviceID=sensorId, Unit=++unit,
-                        Type=243, Subtype=28,
-                        Description="Energy Meter Forward Active Energy").Create()
-        Domoticz.Device(Name="Energy Meter Forward Reactive Energy", DeviceID=sensorId, Unit=++unit,
-                        Type=243, Subtype=28,
-                        Description="Energy Meter Forward Reactive Energy").Create()
-        Domoticz.Device(Name="Energy Meter Reverse Active Energy", DeviceID=sensorId, Unit=++unit,
-                        Type=243, Subtype=28,
-                        Description="Energy Meter Reverse Active Energy").Create()
-        Domoticz.Device(Name="Energy Meter Reverse Reactive Energy", DeviceID=sensorId, Unit=++unit,
-                        Type=243, Subtype=28,
-                        Description="Energy Meter Reverse Reactive Energy").Create()
+    
+    def UpdateDevice(manufacturerId, productId, device, message):
+        if(manufacturerId == Energine.MFRID_ENERGENIE):
+            Energine.UpdateDevice(device, productId, message)
+        elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
+            AxioLogix.UpdateDevice(device, productId, message)
 
 global _plugin
 _plugin = BasePlugin()

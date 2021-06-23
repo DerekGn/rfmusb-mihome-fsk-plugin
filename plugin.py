@@ -185,13 +185,14 @@ class BasePlugin:
         self.SerialConn.Send(Command + "\n")
 
     def DecodeAndProcessFifoData(self, data):
-        data = data.replace("[", "").replace("]", "")
-        payload = bytearray.fromhex()
         try:
+            payload = bytearray.fromhex(data)
             message = OpenThings.decode(payload)
             self.handle_message(message)
-        except OpenThings.OpenThingsException:
-            Domoticz.Error("Unable to decode payload:%s" % payload)
+        except ValueError as ve:
+            Domoticz.Error("Unable to decode payload: [%s]" + ve % payload)
+        except OpenThings.OpenThingsException as error:
+            Domoticz.Error("Unable to decode payload: [%s]" + error % payload)
 
     def HandleMessage(self, message):
         header = message["header"]

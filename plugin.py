@@ -78,9 +78,9 @@ import Common
 class BasePlugin:
 
     CMD_GET_FIRMWARE_VERSION = "g-fv"
+    CMD_SET_STANDBY = "e-om 1"
     CMD_GET_FIFO = "g-fifo"
-    CMD_EXECUTE_TX = "e-tx "
-    COMMAND_RESULT_OK = "OK"
+    CMD_RESULT_OK = "OK"
 
     InitCommands = [
         "e-r",
@@ -141,11 +141,8 @@ class BasePlugin:
         strData = Data.decode("ascii")
         strData = strData.replace("\n", "")
 
-        if(self.LastCommand == ""):
-            Domoticz.Log(
-                "Command Executed: ["+self.LastCommand+"] Respose: ["+strData+"] ")
-        else:
-            Domoticz.Log("Message: ["+strData+"] ")
+        Domoticz.Log(
+            "Command Executed: ["+self.LastCommand+"] Respose: ["+strData+"] ")
 
         if(self.IsInitalised == False):
             if(self.CommandIndex < len(self.InitCommands)):
@@ -160,7 +157,10 @@ class BasePlugin:
                 self.IsInitalised = True
         else:
             if("DIO PIN IRQ" in strData):
-                # Read the FIFO
+                # enter standby to prevent buffer overwrite
+                self.SendCommand(self.CMD_SET_STANDBY)
+            elif(self.LastCommand == self.CMD_SET_STANDBY):
+                # Get the fifo
                 self.SendCommand(self.CMD_GET_FIFO)
             elif(self.LastCommand == self.CMD_GET_FIFO):
                 # Decode the fifo data

@@ -98,7 +98,9 @@ class BasePlugin:
         "s-af 0",
         "s-pl 66",
         "s-dio 0 1",
-        "s-di 1"
+        "s-di 1,"
+        "s-op",
+        "s-om 4"
     ]
 
     LastCommand = ""
@@ -141,17 +143,18 @@ class BasePlugin:
         Domoticz.Log(
             "Command Executed: ["+self.LastCommand+"] Respose: ["+strData+"] ")
 
-        if(self.IsInitalised == False and self.LastCommand.startswith("s-op")):
+        if(self.IsInitalised == False and self.CommandIndex == len(self.InitCommands)):
             self.IsInitalised = True
 
         if(self.IsInitalised == False):
             if(self.CommandIndex < len(self.InitCommands)):
-                self.SendCommand(self.InitCommands[self.CommandIndex])
+                if(self.InitCommands[self.CommandIndex].startswith("s-op")):
+                    self.SendCommand("s-op " + str(Parameters["Mode4"]))
+                else:
+                    self.SendCommand(self.InitCommands[self.CommandIndex])
+                
                 self.CommandIndex = self.CommandIndex + 1
-            else:
-                # Append setting of power command to initalisation
-                self.SendCommand("s-op " + str(Parameters["Mode4"]))
-
+                
         if(strData.startswith("DIO PIN IRQ")):
             # Read the FIFO
             self.SendCommand("g-fifo")

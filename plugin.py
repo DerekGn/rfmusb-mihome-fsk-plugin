@@ -98,7 +98,7 @@ class BasePlugin:
         "s-af 0",
         "s-pl 66",
         "s-dio 0 1",
-        "s-di 1,"
+        "s-di 1",
         "s-op",
         "s-om 4"
     ]

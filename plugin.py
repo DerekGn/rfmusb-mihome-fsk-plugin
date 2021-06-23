@@ -147,10 +147,6 @@ class BasePlugin:
         else:
             Domoticz.Log("Message: ["+strData+"] ")
 
-        if(self.IsInitalised == False and self.CommandIndex == len(self.InitCommands)):
-            self.LastCommand = ""
-            self.IsInitalised = True
-
         if(self.IsInitalised == False):
             if(self.CommandIndex < len(self.InitCommands)):
                 if(self.InitCommands[self.CommandIndex].startswith("s-op")):
@@ -159,13 +155,16 @@ class BasePlugin:
                     self.SendCommand(self.InitCommands[self.CommandIndex])
 
                 self.CommandIndex = self.CommandIndex + 1
-
-        if("DIO PIN IRQ" in strData):
-            # Read the FIFO
-            self.SendCommand(self.CMD_GET_FIFO)
-        elif(self.LastCommand == self.CMD_GET_FIFO):
-            # Decode the fifo data
-            self.DecodeAndProcessFifoData(strData)
+            else:
+                self.LastCommand = ""
+                self.IsInitalised = True
+        else:
+            if("DIO PIN IRQ" in strData):
+                # Read the FIFO
+                self.SendCommand(self.CMD_GET_FIFO)
+            elif(self.LastCommand == self.CMD_GET_FIFO):
+                # Decode the fifo data
+                self.DecodeAndProcessFifoData(strData)
 
     def onCommand(self, Unit, Command, Level, Hue):
         Domoticz.Log("onCommand called for Unit " + str(Unit) +

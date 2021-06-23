@@ -74,8 +74,10 @@ def CreateDevice(sensorId, productId):
 
 def UpdateDevice(device, productId, message):
     if(productId == PRODUCTID_MIHO032):
+        Domoticz.Log("Updating Motion Sensor Id: " + str(device.ID))
         motionRecord = Common.FindRecord(message, OpenThings.PARAM_MOTION_DETECTOR)
         device[1].Update(nValue=int(motionRecord["value"]))
     elif(productId == PRODUCTID_MIHO033):
+        Domoticz.Log("Updating Door Sensor Id: " + str(device.ID))
         doorRecord = Common.FindRecord(message, OpenThings.PARAM_DOOR_SENSOR)
         device[1].Update(nValue=int(doorRecord["value"]))

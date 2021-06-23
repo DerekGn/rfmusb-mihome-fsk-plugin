@@ -185,7 +185,8 @@ class BasePlugin:
         self.SerialConn.Send(Command + "\n")
 
     def DecodeAndProcessFifoData(self, data):
-        payload = bytearray.fromhex('hex')
+        data = data.replace('[').replace(']')
+        payload = bytearray.fromhex()
         try:
             message = OpenThings.decode(payload)
             self.handle_message(message)

@@ -80,6 +80,7 @@ class BasePlugin:
     CMD_GET_FIRMWARE_VERSION = "g-fv"
     CMD_SET_STANDBY = "e-om 1"
     CMD_GET_FIFO = "g-fifo"
+    CMD_SET_RX = "s-om 4"
     CMD_RESULT_OK = "OK"
 
     InitCommands = [
@@ -101,8 +102,7 @@ class BasePlugin:
         "s-pl 66",
         "s-dio 0 1",
         "s-di 1",
-        "s-op",
-        "s-om 4"
+        "s-op"
     ]
 
     LastCommand = ""
@@ -155,6 +155,7 @@ class BasePlugin:
             else:
                 self.LastCommand = ""
                 self.IsInitalised = True
+                self.SendCommand(self.CMD_SET_RX)
         else:
             if("DIO PIN IRQ" in strData):
                 # enter standby to prevent buffer overwrite

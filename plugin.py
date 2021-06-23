@@ -78,6 +78,7 @@ import Common
 class BasePlugin:
 
     CMD_GET_FIRMWARE_VERSION = "g-fv"
+    CMD_GET_FIFO = "g-fifo"
     CMD_EXECUTE_TX = "e-tx "
     COMMAND_RESULT_OK = "OK"
 
@@ -108,7 +109,6 @@ class BasePlugin:
     CommandIndex = 0
     SerialConn = None
     IsInitalised = False
-    FifoRead = False
 
     def __init__(self):
         return
@@ -160,13 +160,10 @@ class BasePlugin:
 
                 self.CommandIndex = self.CommandIndex + 1
 
-        if(strData.contains("DIO PIN IRQ")):
+        if("DIO PIN IRQ" in strData):
             # Read the FIFO
-            self.SendCommand("g-fifo")
-            self.FifoRead = True
-
-        if(self.FifoRead == True):
-            self.FifoRead = False
+            self.SendCommand(self.CMD_GET_FIFO)
+        elif(self.LastCommand == self.CMD_GET_FIFO):
             # Decode the fifo data
             self.DecodeAndProcessFifoData(strData)
 

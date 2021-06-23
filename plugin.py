@@ -74,6 +74,7 @@ import AxioLogix
 import Energine
 import Common
 
+
 class BasePlugin:
 
     CMD_GET_FIRMWARE_VERSION = "g-fv"
@@ -140,10 +141,14 @@ class BasePlugin:
         strData = Data.decode("ascii")
         strData = strData.replace("\n", "")
 
-        Domoticz.Log(
-            "Command Executed: ["+self.LastCommand+"] Respose: ["+strData+"] ")
+        if(self.LastCommand == ""):
+            Domoticz.Log(
+                "Command Executed: ["+self.LastCommand+"] Respose: ["+strData+"] ")
+        else:
+            Domoticz.Log("Message: ["+strData+"] ")
 
         if(self.IsInitalised == False and self.CommandIndex == len(self.InitCommands)):
+            self.LastCommand = ""
             self.IsInitalised = True
 
         if(self.IsInitalised == False):
@@ -152,15 +157,16 @@ class BasePlugin:
                     self.SendCommand("s-op " + str(Parameters["Mode4"]))
                 else:
                     self.SendCommand(self.InitCommands[self.CommandIndex])
-                
+
                 self.CommandIndex = self.CommandIndex + 1
-                
-        if(strData.startswith("DIO PIN IRQ")):
+
+        if(strData.contains("DIO PIN IRQ")):
             # Read the FIFO
             self.SendCommand("g-fifo")
             self.FifoRead = True
 
         if(self.FifoRead == True):
+            self.FifoRead = False
             # Decode the fifo data
             self.DecodeAndProcessFifoData(strData)
 
@@ -190,16 +196,16 @@ class BasePlugin:
             message = OpenThings.decode(payload)
             self.handle_message(message)
         except ValueError as ve:
-            Domoticz.Error("Unable to decode payload: [%s]" + ve % payload)
+            Domoticz.Error("Unable to decode payload: " + ve)
         except OpenThings.OpenThingsException as error:
-            Domoticz.Error("Unable to decode payload: [%s]" + error % payload)
+            Domoticz.Error("Unable to decode payload: " + error)
 
     def HandleMessage(self, message):
         header = message["header"]
         sensorId = header["sensorid"]
         productId = header["productid"]
         manufacturerId = header["mfrid"]
-        
+
         device = self.FindDevice(sensorId)
 
         if(device is None):
@@ -224,12 +230,13 @@ class BasePlugin:
         else:
             Domoticz.Error("Unknown Sensor Id: " +
                            str(sensorId) + " Product Id: " + str(productId))
-    
+
     def UpdateDevice(manufacturerId, productId, device, message):
         if(manufacturerId == Energine.MFRID_ENERGENIE):
             Energine.UpdateDevice(device, productId, message)
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
             AxioLogix.UpdateDevice(device, productId, message)
+
 
 global _plugin
 _plugin = BasePlugin()

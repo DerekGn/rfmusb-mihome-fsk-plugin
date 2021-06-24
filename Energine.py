@@ -63,12 +63,12 @@ CRYPT_PIP                        = 0x0100
 def CreateDevice(sensorId, productId):
     if(productId == PRODUCTID_MIHO032):
         Domoticz.Log("Creating Motion Sensor Id: " + str(sensorId))
-        Domoticz.Device(Name="Motion Sensor", DeviceID=sensorId, Unit=1,
+        Domoticz.Device(Name="Motion Sensor", DeviceID=str(sensorId), Unit=1,
                         TypeName="Switch", Type=244, Subtype=62, Switchtype=8,
                         Description="MIHO032 Infra red Motion Sensor").Create()
     elif(productId == PRODUCTID_MIHO033):
         Domoticz.Log("Creating Door Sensor Id: " + str(sensorId))
-        Domoticz.Device(Name="Door Sensor", DeviceID=sensorId, Unit=1,
+        Domoticz.Device(Name="Door Sensor", DeviceID=str(sensorId), Unit=1,
                         TypeName="Switch", Type=244, Subtype=73, Switchtype=11,
                         Description="MIHO033 Door Sensor").Create()
 
@@ -76,8 +76,8 @@ def UpdateDevice(device, productId, message):
     if(productId == PRODUCTID_MIHO032):
         Domoticz.Log("Updating Motion Sensor Id: " + str(device.ID))
         motionRecord = Common.FindRecord(message, OpenThings.PARAM_MOTION_DETECTOR)
-        device[1].Update(nValue=int(motionRecord["value"]))
+        device.Update(nValue=int(motionRecord["value"]))
     elif(productId == PRODUCTID_MIHO033):
         Domoticz.Log("Updating Door Sensor Id: " + str(device.ID))
         doorRecord = Common.FindRecord(message, OpenThings.PARAM_DOOR_SENSOR)
-        device[1].Update(nValue=int(doorRecord["value"]))
+        device.Update(nValue=int(doorRecord["value"]))

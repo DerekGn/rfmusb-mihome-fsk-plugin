@@ -114,7 +114,7 @@ class BasePlugin:
         return
 
     def onStart(self):
-        OpenThings.init(0)
+        OpenThings.init(242)
         SerialConn = Domoticz.Connection(Name="Serial Connection", Transport="Serial",
                                          Protocol="None", Address=Parameters["SerialPort"], Baud=115200)
         SerialConn.Connect()
@@ -158,13 +158,10 @@ class BasePlugin:
                 self.SendCommand(self.CMD_SET_RX)
         else:
             if("DIO PIN IRQ" in strData):
-                # enter standby to prevent buffer overwrite
-                self.SendCommand(self.CMD_SET_STANDBY)
-            elif(self.LastCommand == self.CMD_SET_STANDBY):
-                # Get the fifo
                 self.SendCommand(self.CMD_GET_FIFO)
             elif(self.LastCommand == self.CMD_GET_FIFO):
                 # Decode the fifo data
+                self.LastCommand = ""
                 self.DecodeAndProcessFifoData(strData)
 
     def onCommand(self, Unit, Command, Level, Hue):
@@ -189,24 +186,28 @@ class BasePlugin:
 
     def DecodeAndProcessFifoData(self, data):
         try:
-            payload = bytearray.fromhex(data)
-            message = OpenThings.decode(payload)
-            self.handle_message(message)
-        except ValueError as ve:
-            Domoticz.Error("Unable to decode payload: " + ve)
+             fifo = bytearray.fromhex(data)
+             length = fifo[0]
+             if(length > 10 and length+1 < 64 ):
+                message = fifo[0:length+1]
+                Domoticz.Log("Message: " + "".join("%02x" % b for b in message))
+                openthingsMessage  = OpenThings.decode(message)
+                self.HandleMessage(openthingsMessage)
         except OpenThings.OpenThingsException as error:
-            Domoticz.Error("Unable to decode payload: " + error)
+            Domoticz.Error("Unable to decode payload: " + str(error))
 
     def HandleMessage(self, message):
+        Domoticz.Log(str(message))
         header = message["header"]
         sensorId = header["sensorid"]
         productId = header["productid"]
         manufacturerId = header["mfrid"]
 
         device = self.FindDevice(sensorId)
-
+        Domoticz.Log("Device: " + str(device))
         if(device is None):
             join = Common.FindRecord(message, OpenThings.PARAM_JOIN)
+            Domoticz.Log("Join: " + str(join))
             if(join is not None):
                 Domoticz.Log("Join Message From SensorId: "+str(sensorId))
                 self.AddDevice(manufacturerId, sensorId, productId)
@@ -216,7 +217,7 @@ class BasePlugin:
 
     def FindDevice(self, sensorId):
         for x in Devices:
-            if(Devices[x].ID == sensorId):
+            if(Devices[x].DeviceID == str(sensorId)):
                 return Devices[x]
 
     def AddDevice(self, manufacturerId, sensorId, productId):
@@ -228,7 +229,7 @@ class BasePlugin:
             Domoticz.Error("Unknown Sensor Id: " +
                            str(sensorId) + " Product Id: " + str(productId))
 
-    def UpdateDevice(manufacturerId, productId, device, message):
+    def UpdateDevice(self, manufacturerId, productId, device, message):
         if(manufacturerId == Energine.MFRID_ENERGENIE):
             Energine.UpdateDevice(device, productId, message)
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):

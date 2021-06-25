@@ -128,7 +128,7 @@ class BasePlugin:
                          Parameters["SerialPort"])
 
             self.SerialConn = Connection
-            self.SendCommand(self.CMD_GET_FIRMWARE_VERSION)
+            self.sendCommand(self.CMD_GET_FIRMWARE_VERSION)
         else:
             Domoticz.Log("Failed to connect ("+str(Status) +
                          ") to: "+Parameters["SerialPort"])
@@ -141,28 +141,28 @@ class BasePlugin:
         strData = Data.decode("ascii")
         strData = strData.replace("\n", "")
 
-        Domoticz.Log(
+        Domoticz.Debug(
             "Command Executed: ["+self.LastCommand+"] Respose: ["+strData+"] ")
 
         if(self.IsInitalised == False):
             if(self.CommandIndex < len(self.InitCommands)):
                 if(self.InitCommands[self.CommandIndex].startswith("s-op")):
-                    self.SendCommand("s-op " + str(Parameters["Mode4"]))
+                    self.sendCommand("s-op " + str(Parameters["Mode4"]))
                 else:
-                    self.SendCommand(self.InitCommands[self.CommandIndex])
+                    self.sendCommand(self.InitCommands[self.CommandIndex])
 
                 self.CommandIndex = self.CommandIndex + 1
             else:
                 self.LastCommand = ""
                 self.IsInitalised = True
-                self.SendCommand(self.CMD_SET_RX)
+                self.sendCommand(self.CMD_SET_RX)
         else:
             if("DIO PIN IRQ" in strData):
-                self.SendCommand(self.CMD_GET_FIFO)
+                self.sendCommand(self.CMD_GET_FIFO)
             elif(self.LastCommand == self.CMD_GET_FIFO):
                 # Decode the fifo data
                 self.LastCommand = ""
-                self.DecodeAndProcessFifoData(strData)
+                self.decodeProcessFifoData(strData)
 
     def onCommand(self, Unit, Command, Level, Hue):
         Domoticz.Log("onCommand called for Unit " + str(Unit) +
@@ -180,60 +180,63 @@ class BasePlugin:
         pass
 
     # Support functions
-    def SendCommand(self, Command):
+    def sendCommand(self, Command):
         self.LastCommand = Command
         self.SerialConn.Send(Command + "\n")
 
-    def DecodeAndProcessFifoData(self, data):
+    def decodeProcessFifoData(self, data):
         try:
-             fifo = bytearray.fromhex(data)
-             length = fifo[0]
-             if(length > 10 and length+1 < 64 ):
+            fifo = bytearray.fromhex(data)
+            length = fifo[0]
+            if(length > 10 and length+1 < 64):
                 message = fifo[0:length+1]
-                Domoticz.Log("Message: " + "".join("%02x" % b for b in message))
-                openthingsMessage  = OpenThings.decode(message)
-                self.HandleMessage(openthingsMessage)
+                Domoticz.Debug("Message: " + "".join("%02x" %
+                                                     b for b in message))
+                openthingsMessage = OpenThings.decode(message)
+                self.handleMessage(openthingsMessage)
         except OpenThings.OpenThingsException as error:
-            Domoticz.Error("Unable to decode payload: " + str(error))
+            errorMessage = str(error)
+            if("bad CRC" not in errorMessage):
+                Domoticz.Error("Unable to decode payload: " + errorMessage)
 
-    def HandleMessage(self, message):
+    def handleMessage(self, message):
         Domoticz.Log(str(message))
         header = message["header"]
         sensorId = header["sensorid"]
         productId = header["productid"]
         manufacturerId = header["mfrid"]
 
-        device = self.FindDevice(sensorId)
+        device = self.findDevice(sensorId)
         Domoticz.Log("Device: " + str(device))
         if(device is None):
-            join = Common.FindRecord(message, OpenThings.PARAM_JOIN)
+            join = Common.findRecord(message, OpenThings.PARAM_JOIN)
             Domoticz.Log("Join: " + str(join))
             if(join is not None):
                 Domoticz.Log("Join Message From SensorId: "+str(sensorId))
-                self.AddDevice(manufacturerId, sensorId, productId)
+                self.addDevice(manufacturerId, sensorId, productId)
         else:
             Domoticz.Log("Updating Device SensorId: "+str(sensorId))
-            self.UpdateDevice(manufacturerId, productId, device, message)
+            self.updateDevice(manufacturerId, productId, device, message)
 
-    def FindDevice(self, sensorId):
+    def findDevice(self, sensorId):
         for x in Devices:
             if(Devices[x].DeviceID == str(sensorId)):
                 return Devices[x]
 
-    def AddDevice(self, manufacturerId, sensorId, productId):
+    def addDevice(self, manufacturerId, sensorId, productId):
         if(manufacturerId == Energine.MFRID_ENERGENIE):
-            Energine.CreateDevice(sensorId, productId)
+            Energine.createDevice(sensorId, productId)
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
-            AxioLogix.CreateDevice(sensorId, productId)
+            AxioLogix.createDevice(sensorId, productId)
         else:
             Domoticz.Error("Unknown Sensor Id: " +
                            str(sensorId) + " Product Id: " + str(productId))
 
-    def UpdateDevice(self, manufacturerId, productId, device, message):
+    def updateDevice(self, manufacturerId, productId, device, message):
         if(manufacturerId == Energine.MFRID_ENERGENIE):
-            Energine.UpdateDevice(device, productId, message)
+            Energine.updateDevice(device, productId, message)
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
-            AxioLogix.UpdateDevice(device, productId, message)
+            AxioLogix.updateDevice(device, productId, message)
 
 
 global _plugin

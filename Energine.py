@@ -62,7 +62,7 @@ CRYPT_PIP = 0x0100
 
 
 def createDevice(sensorId, productId):
-    deviceId = str(productId) + ":" + str(productId)
+    deviceId = str(productId) + ":" + str(sensorId)
 
     if(productId == PRODUCTID_MIHO032):
         Domoticz.Log("Creating Motion Sensor Id: " + deviceId)

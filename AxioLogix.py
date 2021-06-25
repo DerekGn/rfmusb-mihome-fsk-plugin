@@ -14,7 +14,7 @@ PRODUCTID_AQS = 0x02
 PRODUCTID_EM = 0x03
 
 def createDevice(sensorId, productId):
-    deviceId = str(productId) + ":" + str(productId)
+    deviceId = str(sensorId) + ":" + str(productId)
 
     if(productId == PRODUCTID_TEMPHUMIDITY):
         Domoticz.Log("Creating Temp Humidity Sensor Id: " + deviceId)

@@ -13,87 +13,106 @@ PRODUCTID_TEMPHUMIDITY = 0x01
 PRODUCTID_AQS = 0x02
 PRODUCTID_EM = 0x03
 
-def createDevice(sensorId, productId):
+def createDevice(sensorId, productId, unitIndex):
     deviceId = str(sensorId) + ":" + str(productId)
 
     if(productId == PRODUCTID_TEMPHUMIDITY):
-        Domoticz.Log("Creating Temp Humidity Sensor Id: " + deviceId)
-        Domoticz.Device(Name="Temp Humidity Sensor", DeviceID=deviceId, Unit=1,
+        unitIndex += 1
+        Domoticz.Log("Creating Temp Humidity Sensor Id: " + deviceId + " Unit Id: " + str(unitIndex))
+        Domoticz.Device(Name="Temp Humidity Sensor", DeviceID=deviceId, Unit=unitIndex,
                         TypeName="Temp+Hum", Type=82,
                         Description="RfmTemp Sensor").Create()
     elif(productId == PRODUCTID_AQS):
-        Domoticz.Log("Creating Aqs Sensor Id: " + deviceId)
-        Domoticz.Device(Name="AQS", DeviceID=sensorId, Unit=1,
+        unitIndex += 1
+        Domoticz.Log("Creating Aqs Sensor Id: " + deviceId + " Unit Id: " + str(unitIndex))
+        Domoticz.Device(Name="AQS", DeviceID=sensorId, Unit=unitIndex,
                         Type=243, Subtype=31,
                         Options={'Custom': '1;VOC Index'},
                         Description="RfmAqs Sensor").Create()
-        Domoticz.Device(Name="AQS Temp & Humidity", DeviceId=deviceId, Unit=2,
+        unitIndex += 1
+        Domoticz.Device(Name="AQS Temp & Humidity", DeviceId=deviceId, Unit=unitIndex,
                         TypeName="Temp+Hum", Type=82,
                         Description="RfmAqs Temp & Humidity").Create()
     elif(productId == PRODUCTID_EM):
-        Domoticz.Log("Creating Energy Meter Id: " + deviceId)
-        Domoticz.Device(Name="Energy Meter Voltage", DeviceID=deviceId, Unit=1,
+        unitIndex += 1
+        Domoticz.Log("Creating Energy Meter Sensor Id: " + deviceId + " Unit Id: " + str(unitIndex))
+        Domoticz.Device(Name="Energy Meter Voltage", DeviceID=deviceId, Unit=unitIndex,
                         Type=243, Subtype=31,
                         Options={'Custom': '1;VAC'},
                         Description="Rms Voltage").Create()
-        Domoticz.Device(Name="Energy Meter Frequency", DeviceID=deviceId, Unit=2,
+        unitIndex += 1
+        Domoticz.Device(Name="Energy Meter Frequency", DeviceID=deviceId, Unit=unitIndex,
                         Type=243, Subtype=31,
                         Options={'Custom': '1;Hz'},
                         Description="Line Voltage Frequency").Create()
+        
+        unitIndex = createLineMeasurements('L', deviceId, unitIndex)
+        unitIndex = createLineMeasurements('n', deviceId, unitIndex)
+        unitIndex = createEnergyMeasurements(deviceId, unitIndex)
 
-        createLineMeasurements('L', deviceId, 3)
-
-        createLineMeasurements('n', deviceId, 9)
-
-        createEnergyMeasurements(deviceId, 15)
+        return unitIndex
 
 
-def createLineMeasurements(line, deviceId, unit):
-    Domoticz.Device(Name="Energy Meter " + line + " Current", DeviceID=deviceId, Unit=unit,
+def createLineMeasurements(line, deviceId, unitIndex):
+    unitIndex += 1
+    Domoticz.Device(Name="Energy Meter " + line + " Current", DeviceID=deviceId, Unit=unitIndex,
                     Type=243, Subtype=31,
                     Options={'Custom': '1;Irms'},
                     Description=line + " Line Rms Current").Create()
-    Domoticz.Device(Name="Energy Meter " + line + " Phase", DeviceID=deviceId, Unit=++unit,
+    unitIndex += 1
+    Domoticz.Device(Name="Energy Meter " + line + " Phase", DeviceID=deviceId, Unit=unitIndex,
                     Type=243, Subtype=31,
                     Options={'Custom': '1;°'},
                     Description="Phase Angle between Voltage and " + line + " Line Current").Create()
-    Domoticz.Device(Name="Energy Meter " + line + " PMean", DeviceID=deviceId, Unit=++unit,
+    unitIndex += 1
+    Domoticz.Device(Name="Energy Meter " + line + " PMean", DeviceID=deviceId, Unit=unitIndex,
                     Type=243, Subtype=31,
                     Options={'Custom': '1;kW'},
                     Description=line + " Line Mean Active Power").Create()
-    Domoticz.Device(Name="Energy Meter " + line + " QMean", DeviceID=deviceId, Unit=++unit,
+    unitIndex += 1
+    Domoticz.Device(Name="Energy Meter " + line + " QMean", DeviceID=deviceId, Unit=unitIndex,
                     Type=243, Subtype=31,
                     Options={'Custom': '1;kvar'},
                     Description=line + " Line Mean Reactive Power").Create()
-    Domoticz.Device(Name="Energy Meter " + line + "Power Factor", DeviceID=deviceId, Unit=++unit,
+    unitIndex += 1
+    Domoticz.Device(Name="Energy Meter " + line + "Power Factor", DeviceID=deviceId, Unit=unitIndex,
                     Type=243, Subtype=31,
                     Description=line + " Line Power Factor").Create()
-    Domoticz.Device(Name="Energy Meter " + line + " SMean", DeviceID=deviceId, Unit=++unit,
+    unitIndex += 1
+    Domoticz.Device(Name="Energy Meter " + line + " SMean", DeviceID=deviceId, Unit=unitIndex,
                     Type=243, Subtype=31,
                     Options={'Custom': '1;kVA'},
                     Description=line + " Line Mean Apparent Power").Create()
 
+    return unitIndex
 
-def createEnergyMeasurements(deviceId, unit):
+def createEnergyMeasurements(deviceId, unitIndex):
+    unitIndex += 1
     Domoticz.Device(Name="Energy Meter Absolute Active Energy", DeviceID=deviceId, Unit=unit,
                     Type=243, Subtype=28,
                     Description="Energy Meter Absolute Active Energy").Create()
-    Domoticz.Device(Name="Energy Meter Absolute Reactive Energy", DeviceID=deviceId, Unit=++unit,
+    unitIndex += 1
+    Domoticz.Device(Name="Energy Meter Absolute Reactive Energy", DeviceID=deviceId, Unit=unitIndex,
                     Type=243, Subtype=28,
                     Description="Energy Meter Absolute Reactive Energy").Create()
-    Domoticz.Device(Name="Energy Meter Forward Active Energy", DeviceID=deviceId, Unit=++unit,
+    unitIndex += 1
+    Domoticz.Device(Name="Energy Meter Forward Active Energy", DeviceID=deviceId, Unit=unitIndex,
                     Type=243, Subtype=28,
                     Description="Energy Meter Forward Active Energy").Create()
-    Domoticz.Device(Name="Energy Meter Forward Reactive Energy", DeviceID=deviceId, Unit=++unit,
+    unitIndex += 1
+    Domoticz.Device(Name="Energy Meter Forward Reactive Energy", DeviceID=deviceId, Unit=unitIndex,
                     Type=243, Subtype=28,
                     Description="Energy Meter Forward Reactive Energy").Create()
-    Domoticz.Device(Name="Energy Meter Reverse Active Energy", DeviceID=deviceId, Unit=++unit,
+    unitIndex += 1
+    Domoticz.Device(Name="Energy Meter Reverse Active Energy", DeviceID=deviceId, Unit=unitIndex,
                     Type=243, Subtype=28,
                     Description="Energy Meter Reverse Active Energy").Create()
-    Domoticz.Device(Name="Energy Meter Reverse Reactive Energy", DeviceID=deviceId, Unit=++unit,
+    unitIndex += 1
+    Domoticz.Device(Name="Energy Meter Reverse Reactive Energy", DeviceID=deviceId, Unit=unitIndex,
                     Type=243, Subtype=28,
                     Description="Energy Meter Reverse Reactive Energy").Create()
 
+    return unitIndex
 
 def updateDevice(device, productId, message):
     if(productId == PRODUCTID_TEMPHUMIDITY):
@@ -178,15 +197,15 @@ def updateLineMeasurements(device, currentRecord, phaseRecord, activePowerRecord
     # Current
     device[unit].Update(nValue=currentRecord["value"] / 1000.0)
     # Phase
-    device[++unit].Update(nValue=phaseRecord["value"] / 10.0)
+    device[unitIndex].Update(nValue=phaseRecord["value"] / 10.0)
     # Mean Active Power
-    device[++unit].Update(nValue=activePowerRecord["value"] / 1000.0)
+    device[unitIndex].Update(nValue=activePowerRecord["value"] / 1000.0)
     # Mean Reactive Power
-    device[++unit].Update(nValue=reactivePowerRecord["value"] / 1000.0)
+    device[unitIndex].Update(nValue=reactivePowerRecord["value"] / 1000.0)
     # Power Factor
-    device[++unit].Update(nValue=powerFactorRecord["value"] / 1000.0)
+    device[unitIndex].Update(nValue=powerFactorRecord["value"] / 1000.0)
     # Apparent Power
-    device[++unit].Update(nValue=apparentPowerRecord["value"] / 1000.0)
+    device[unitIndex].Update(nValue=apparentPowerRecord["value"] / 1000.0)
 
 def updateEnergyMeasurements(device, message):
     # Absolute Active Energy

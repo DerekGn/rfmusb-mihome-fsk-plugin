@@ -251,9 +251,9 @@ class BasePlugin:
 
     def addDevice(self, manufacturerId, sensorId, productId):
         if(manufacturerId == Energine.MFRID_ENERGENIE):
-            Energine.createDevice(sensorId, productId)
+            Energine.createDevice(sensorId, productId, self.UnitIndex)
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
-            AxioLogix.createDevice(sensorId, productId)
+            AxioLogix.createDevice(sensorId, productId, self.UnitIndex)
         else:
             Domoticz.Error("Unknown Sensor Id: " +
                            str(sensorId) + " Product Id: " + str(productId))

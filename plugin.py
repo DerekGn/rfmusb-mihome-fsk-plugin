@@ -114,6 +114,9 @@ class BasePlugin:
         return
 
     def onStart(self):
+        #if Parameters["Mode6"] == "Debug":
+        Domoticz.Debugging(1)
+
         OpenThings.init(242)
         SerialConn = Domoticz.Connection(Name="Serial Connection", Transport="Serial",
                                          Protocol="None", Address=Parameters["SerialPort"], Baud=115200)

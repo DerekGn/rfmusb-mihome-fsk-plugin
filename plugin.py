@@ -116,7 +116,7 @@ class BasePlugin:
 
     def onStart(self):
         # if Parameters["Mode6"] == "Debug":
-        Domoticz.Debugging(1)
+        Domoticz.Debugging(3)
 
         DumpConfigToLog()
 
@@ -195,6 +195,10 @@ class BasePlugin:
                 unitCount += 1
             elif(Devices[x].Type == 82):
                 unitCount += 1
+        
+        Domoticz.Log("UnitCount: " + str(unitCount))
+        
+        return unitCount
 
     def sendCommand(self, Command):
         self.LastCommand = Command

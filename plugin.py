@@ -105,6 +105,7 @@ class BasePlugin:
         "s-op"
     ]
 
+    UnitIndex = 0
     LastCommand = ""
     CommandIndex = 0
     SerialConn = None
@@ -114,11 +115,13 @@ class BasePlugin:
         return
 
     def onStart(self):
-        #if Parameters["Mode6"] == "Debug":
+        # if Parameters["Mode6"] == "Debug":
         Domoticz.Debugging(1)
-        
+
         DumpConfigToLog()
-        
+
+        UnitIndex = self.getUnitIndex()
+
         OpenThings.init(242)
         SerialConn = Domoticz.Connection(Name="Serial Connection", Transport="Serial",
                                          Protocol="None", Address=Parameters["SerialPort"], Baud=115200)
@@ -185,6 +188,14 @@ class BasePlugin:
         pass
 
     # Support functions
+    def getUnitIndex(self):
+        unitCount = 0
+        for x in Devices:
+            if(Devices[x].Type == 244):
+                unitCount += 1
+            elif(Devices[x].Type == 82):
+                unitCount += 1
+
     def sendCommand(self, Command):
         self.LastCommand = Command
         self.SerialConn.Send(Command + "\n")

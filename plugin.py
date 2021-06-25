@@ -233,10 +233,14 @@ class BasePlugin:
         productId = header["productid"]
         manufacturerId = header["mfrid"]
 
-        device = self.findDevice(Common.createDeviceId(productId, sensorId))
+        deviceId = Common.createDeviceId(productId, sensorId)
 
-        Domoticz.Log("Device: " + str(device))
-        
+        Domoticz.Debug("DeviceId: " + deviceId)
+
+        device = self.findDevice(deviceId)
+
+        Domoticz.Debug("Device: " + str(device))
+
         if(device is None):
             join = Common.findRecord(message, OpenThings.PARAM_JOIN)
             Domoticz.Log("Join: " + str(join))

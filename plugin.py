@@ -192,15 +192,15 @@ class BasePlugin:
         unitCount = 0
         for x in Devices:
             deviceId = str(Devices[x].DeviceID)
-            if(deviceId.startswith(Energine.PRODUCTID_MIHO032)):
+            if(deviceId.startswith(str(Energine.PRODUCTID_MIHO032))):
                 unitCount += 1
-            elif(deviceId.startswith(Energine.PRODUCTID_MIHO033)):
+            elif(deviceId.startswith(str(Energine.PRODUCTID_MIHO033))):
                 unitCount += 1
-            elif(deviceId.startswith(AxioLogix.PRODUCTID_TEMPHUMIDITY)):
+            elif(deviceId.startswith(str(AxioLogix.PRODUCTID_TEMPHUMIDITY))):
                 unitCount += 1
-            elif(deviceId.startswith(AxioLogix.PRODUCTID_AQS)):
+            elif(deviceId.startswith(str(AxioLogix.PRODUCTID_AQS))):
                 unitCount += 1
-            elif(deviceId.startswith(AxioLogix.PRODUCTID_EM)):
+            elif(deviceId.startswith(str(AxioLogix.PRODUCTID_EM))):
                 unitCount += 20
 
         Domoticz.Debug("UnitCount: " + str(unitCount))

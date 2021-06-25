@@ -14,7 +14,7 @@ PRODUCTID_AQS = 0x02
 PRODUCTID_EM = 0x03
 
 def createDevice(sensorId, productId, unitIndex):
-    deviceId = str(sensorId) + ":" + str(productId)
+    deviceId = Common.createDeviceId(productId, sensorId)
 
     if(productId == PRODUCTID_TEMPHUMIDITY):
         unitIndex += 1

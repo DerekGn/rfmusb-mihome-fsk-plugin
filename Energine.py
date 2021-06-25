@@ -61,8 +61,7 @@ CRYPT_PID = 242
 CRYPT_PIP = 0x0100
 
 def createDevice(sensorId, productId, unitIndex):
-    deviceId = str(productId) + ":" + str(sensorId)
-
+    deviceId = Common.createDeviceId(productId, sensorId)
     if(productId == PRODUCTID_MIHO032):
         unitIndex += 1
         Domoticz.Log("Creating Motion Sensor Id: " + deviceId)

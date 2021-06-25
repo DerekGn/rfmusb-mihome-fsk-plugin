@@ -8,3 +8,6 @@ def findRecord(message, idToFind):
         parameterId = record["paramid"]
         if(parameterId == idToFind):
             return record
+
+def createDeviceId(productId, sensorId):
+    return str(productId) + ":" + str(sensorId)

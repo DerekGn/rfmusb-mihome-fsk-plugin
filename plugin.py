@@ -233,8 +233,10 @@ class BasePlugin:
         productId = header["productid"]
         manufacturerId = header["mfrid"]
 
-        device = self.findDevice(sensorId)
+        device = self.findDevice(Common.createDeviceId(productId, sensorId))
+
         Domoticz.Log("Device: " + str(device))
+        
         if(device is None):
             join = Common.findRecord(message, OpenThings.PARAM_JOIN)
             Domoticz.Log("Join: " + str(join))
@@ -245,9 +247,9 @@ class BasePlugin:
             Domoticz.Log("Updating Device SensorId: "+str(sensorId))
             self.updateDevice(manufacturerId, productId, device, message)
 
-    def findDevice(self, sensorId):
+    def findDevice(self, deviceId):
         for x in Devices:
-            if(Devices[x].DeviceID == str(sensorId)):
+            if(Devices[x].DeviceID == deviceId):
                 return Devices[x]
 
     def addDevice(self, manufacturerId, sensorId, productId):

@@ -191,15 +191,16 @@ class BasePlugin:
     def getUnitIndex(self):
         unitCount = 0
         for x in Devices:
-            if(Devices[x].DeviceID.startswith(Energine.PRODUCTID_MIHO032)):
+            deviceId = str(Devices[x].DeviceID)
+            if(deviceId.startswith(Energine.PRODUCTID_MIHO032)):
                 unitCount += 1
-            elif(Devices[x].DeviceID.startswith(Energine.PRODUCTID_MIHO033)):
+            elif(deviceId.startswith(Energine.PRODUCTID_MIHO033)):
                 unitCount += 1
-            elif(Devices[x].DeviceID.startswith(AxioLogix.PRODUCTID_TEMPHUMIDITY)):
+            elif(deviceId.startswith(AxioLogix.PRODUCTID_TEMPHUMIDITY)):
                 unitCount += 1
-            elif(Devices[x].DeviceID.startswith(AxioLogix.PRODUCTID_AQS)):
+            elif(deviceId.startswith(AxioLogix.PRODUCTID_AQS)):
                 unitCount += 1
-            elif(Devices[x].DeviceID.startswith(AxioLogix.PRODUCTID_EM)):
+            elif(deviceId.startswith(AxioLogix.PRODUCTID_EM)):
                 unitCount += 20
 
         Domoticz.Debug("UnitCount: " + str(unitCount))

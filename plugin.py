@@ -251,9 +251,9 @@ class BasePlugin:
 
     def addDevice(self, manufacturerId, sensorId, productId):
         if(manufacturerId == Energine.MFRID_ENERGENIE):
-            Energine.createDevice(sensorId, productId, self.UnitIndex)
+            self.UnitIndex = Energine.createDevice(sensorId, productId, self.UnitIndex)
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
-            AxioLogix.createDevice(sensorId, productId, self.UnitIndex)
+            self.UnitIndex = AxioLogix.createDevice(sensorId, productId, self.UnitIndex)
         else:
             Domoticz.Error("Unknown Sensor Id: " +
                            str(sensorId) + " Product Id: " + str(productId))
@@ -309,6 +309,8 @@ def onHeartbeat():
     global _plugin
     _plugin.onHeartbeat()
 
+def onDeviceRemoved(Unit):
+    Domoticz.Debug("Device Removed: " + str(Unit))
     # Generic helper functions
 
 

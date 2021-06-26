@@ -81,10 +81,11 @@ def createDevice(deviceId, productId, unitIndex):
 
 def updateDevice(device, productId, message):
     if(productId == PRODUCTID_MIHO032):
-        Domoticz.Debug("Updating Motion Sensor Id: " + str(device.ID))
         motionRecord = Common.findRecord(
             message, OpenThings.PARAM_MOTION_DETECTOR)
         # TODO map 0 value
+        Domoticz.Debug("Updating Motion Sensor Id: " +
+                       str(device.ID) + str(motionRecord["value"]))
         device.Update(nValue=int(motionRecord["value"]), sValue=str(
             motionRecord["value"]))
     elif(productId == PRODUCTID_MIHO033):

@@ -248,8 +248,8 @@ class BasePlugin:
                 Domoticz.Log("Join Message From SensorId: "+str(sensorId))
                 self.addDevice(manufacturerId, deviceId, productId)
         else:
-            Domoticz.Log("Updating Device SensorId: "+str(sensorId))
-            self.updateDevice(manufacturerId, deviceId, device, message)
+            Domoticz.Debug("Updating Device DeviceId: "+str(deviceId))
+            self.updateDevice(manufacturerId, productId, device, message)
 
     def findDevice(self, deviceId):
         for x in Devices:

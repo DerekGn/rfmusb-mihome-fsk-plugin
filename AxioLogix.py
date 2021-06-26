@@ -19,30 +19,30 @@ def createDevice(deviceId, productId, unitIndex):
         Domoticz.Log("Creating Temp Humidity Sensor Id: " + deviceId + " Unit Id: " + str(unitIndex))
         Domoticz.Device(Name="Temp Humidity Sensor", DeviceID=deviceId, Unit=unitIndex,
                         TypeName="Temp+Hum", Type=82,
-                        Description="RfmTemp Sensor").Create()
+                        Description="RfmTemp Sensor", Used=1).Create()
     elif(productId == PRODUCTID_AQS):
         unitIndex += 1
         Domoticz.Log("Creating Aqs Sensor Id: " + deviceId + " Unit Id: " + str(unitIndex))
         Domoticz.Device(Name="AQS", DeviceID=deviceId, Unit=unitIndex,
                         Type=243, Subtype=31,
                         Options={'Custom': '1;VOC Index'},
-                        Description="RfmAqs Sensor").Create()
+                        Description="RfmAqs Sensor", Used=1).Create()
         unitIndex += 1
         Domoticz.Device(Name="AQS Temp & Humidity", DeviceId=deviceId, Unit=unitIndex,
                         TypeName="Temp+Hum", Type=82,
-                        Description="RfmAqs Temp & Humidity").Create()
+                        Description="RfmAqs Temp & Humidity", Used=1).Create()
     elif(productId == PRODUCTID_EM):
         unitIndex += 1
         Domoticz.Log("Creating Energy Meter Sensor Id: " + deviceId + " Unit Id: " + str(unitIndex))
         Domoticz.Device(Name="Energy Meter Voltage", DeviceID=deviceId, Unit=unitIndex,
                         Type=243, Subtype=31,
                         Options={'Custom': '1;VAC'},
-                        Description="Rms Voltage").Create()
+                        Description="Rms Voltage", Used=1).Create()
         unitIndex += 1
         Domoticz.Device(Name="Energy Meter Frequency", DeviceID=deviceId, Unit=unitIndex,
                         Type=243, Subtype=31,
                         Options={'Custom': '1;Hz'},
-                        Description="Line Voltage Frequency").Create()
+                        Description="Line Voltage Frequency", Used=1).Create()
         
         unitIndex = createLineMeasurements('L', deviceId, unitIndex)
         unitIndex = createLineMeasurements('n', deviceId, unitIndex)

@@ -60,8 +60,7 @@ PRODUCTID_MIHO033 = 0x0D  # FSK: Open sensor
 CRYPT_PID = 242
 CRYPT_PIP = 0x0100
 
-def createDevice(sensorId, productId, unitIndex):
-    deviceId = Common.createDeviceId(productId, sensorId)
+def createDevice(deviceId, productId, unitIndex):
     if(productId == PRODUCTID_MIHO032):
         unitIndex += 1
         Domoticz.Log("Creating Motion Sensor Id: " + deviceId)

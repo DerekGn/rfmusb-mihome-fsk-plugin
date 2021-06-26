@@ -9,5 +9,5 @@ def findRecord(message, idToFind):
         if(parameterId == idToFind):
             return record
 
-def createDeviceId(productId, sensorId):
-    return str(productId) + ":" + str(sensorId)
+def createDeviceId(productId, manufacturerId, sensorId):
+    return str(productId) + ":" + str(manufacturerId) + ":" + str(sensorId)

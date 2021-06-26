@@ -233,7 +233,7 @@ class BasePlugin:
         productId = header["productid"]
         manufacturerId = header["mfrid"]
 
-        deviceId = Common.createDeviceId(productId, sensorId)
+        deviceId = Common.createDeviceId(productId, manufacturerId, sensorId)
 
         Domoticz.Debug("DeviceId: " + deviceId)
 
@@ -246,24 +246,23 @@ class BasePlugin:
             Domoticz.Log("Join: " + str(join))
             if(join is not None):
                 Domoticz.Log("Join Message From SensorId: "+str(sensorId))
-                self.addDevice(manufacturerId, sensorId, productId)
+                self.addDevice(manufacturerId, deviceId, productId)
         else:
             Domoticz.Log("Updating Device SensorId: "+str(sensorId))
-            self.updateDevice(manufacturerId, productId, device, message)
+            self.updateDevice(manufacturerId, deviceId, device, message)
 
     def findDevice(self, deviceId):
         for x in Devices:
             if(Devices[x].DeviceID == deviceId):
                 return Devices[x]
 
-    def addDevice(self, manufacturerId, sensorId, productId):
+    def addDevice(self, manufacturerId, deviceId, productId):
         if(manufacturerId == Energine.MFRID_ENERGENIE):
-            self.UnitIndex = Energine.createDevice(sensorId, productId, self.UnitIndex)
+            self.UnitIndex = Energine.createDevice(deviceId, productId, self.UnitIndex)
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
-            self.UnitIndex = AxioLogix.createDevice(sensorId, productId, self.UnitIndex)
+            self.UnitIndex = AxioLogix.createDevice(deviceId, productId, self.UnitIndex)
         else:
-            Domoticz.Error("Unknown Sensor Id: " +
-                           str(sensorId) + " Product Id: " + str(productId))
+            Domoticz.Error("Unknown Product Id: " + str(productId))
 
     def updateDevice(self, manufacturerId, productId, device, message):
         if(manufacturerId == Energine.MFRID_ENERGENIE):

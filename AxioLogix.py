@@ -13,9 +13,7 @@ PRODUCTID_TEMPHUMIDITY = 0x01
 PRODUCTID_AQS = 0x02
 PRODUCTID_EM = 0x03
 
-def createDevice(sensorId, productId, unitIndex):
-    deviceId = Common.createDeviceId(productId, sensorId)
-
+def createDevice(deviceId, productId, unitIndex):
     if(productId == PRODUCTID_TEMPHUMIDITY):
         unitIndex += 1
         Domoticz.Log("Creating Temp Humidity Sensor Id: " + deviceId + " Unit Id: " + str(unitIndex))
@@ -25,7 +23,7 @@ def createDevice(sensorId, productId, unitIndex):
     elif(productId == PRODUCTID_AQS):
         unitIndex += 1
         Domoticz.Log("Creating Aqs Sensor Id: " + deviceId + " Unit Id: " + str(unitIndex))
-        Domoticz.Device(Name="AQS", DeviceID=sensorId, Unit=unitIndex,
+        Domoticz.Device(Name="AQS", DeviceID=deviceId, Unit=unitIndex,
                         Type=243, Subtype=31,
                         Options={'Custom': '1;VOC Index'},
                         Description="RfmAqs Sensor").Create()
@@ -88,7 +86,7 @@ def createLineMeasurements(line, deviceId, unitIndex):
 
 def createEnergyMeasurements(deviceId, unitIndex):
     unitIndex += 1
-    Domoticz.Device(Name="Energy Meter Absolute Active Energy", DeviceID=deviceId, Unit=unit,
+    Domoticz.Device(Name="Energy Meter Absolute Active Energy", DeviceID=deviceId, Unit=unitIndex,
                     Type=243, Subtype=28,
                     Description="Energy Meter Absolute Active Energy").Create()
     unitIndex += 1

@@ -131,13 +131,11 @@ def updateDevice(device, productId, message):
 
         temperature = ((175.72 * temperatureRecord["value"]) / 65536.0) - 46.85
 
-        batteryLevel = batteryRecord["value"] * 2.55
-
         Domoticz.Debug("Updating TempHumidity Sensor Id: " + str(device.ID) + " Temperature: [" + str(round(temperature, 2)) +
                        "] Humidity: [" + str(round(humidity, 2)) + "]")
 
         device.Update(nValue=int(temperature), sValue=str(
-            temperature) + ";" + str(humidity), BatteryLevel=int(batteryLevel))
+            temperature) + ";" + str(humidity), BatteryLevel=batteryRecord["value"])
     elif(productId == PRODUCTID_AQS):
         Domoticz.Log("Updating AQS Sensor Id: " + str(device.ID))
         temperatureRecord = Common.findRecord(

@@ -115,8 +115,8 @@ class BasePlugin:
         return
 
     def onStart(self):
-        # if Parameters["Mode6"] == "Debug":
-        Domoticz.Debugging(3)
+        if Parameters["Mode6"] == "Debug":
+            Domoticz.Debugging(3)
 
         DumpConfigToLog()
 
@@ -199,7 +199,7 @@ class BasePlugin:
             elif(deviceId.startswith(str(AxioLogix.PRODUCTID_TEMPHUMIDITY))):
                 unitCount += 1
             elif(deviceId.startswith(str(AxioLogix.PRODUCTID_AQS))):
-                unitCount += 1
+                unitCount += 2
             elif(deviceId.startswith(str(AxioLogix.PRODUCTID_EM))):
                 unitCount += 20
 

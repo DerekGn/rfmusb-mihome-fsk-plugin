@@ -6,6 +6,7 @@ import Common
 import Domoticz
 import Energine
 import OpenThings
+import DeviceTypes
 
 MFRID_AXIOLOGIX = 0x55
 
@@ -20,19 +21,19 @@ def createDevice(deviceId, productId, unitIndex):
         Domoticz.Log("Creating Temp Humidity Sensor Id: " +
                      deviceId + " Unit Id: " + str(unitIndex))
         Domoticz.Device(Name="Temp Humidity Sensor", DeviceID=deviceId, Unit=unitIndex,
-                        TypeName="Temp+Hum", Type=82,
+                        TypeName="Temp+Hum", Type=DeviceTypes.DEVICE_TYPE_TEMP_HUMIDITY,
                         Description="RfmTemp Sensor", Used=1).Create()
     elif(productId == PRODUCTID_AQS):
         unitIndex += 1
         Domoticz.Log("Creating Aqs Sensor Id: " +
                      deviceId + " Unit Id: " + str(unitIndex))
         Domoticz.Device(Name="AQS", DeviceID=deviceId, Unit=unitIndex,
-                        Type=243, Subtype=31,
+                        Type=DeviceTypes.DEVICE_TYPE_AIRQUALITY, Subtype=31,
                         Options={'Custom': '1;VOC Index'},
                         Description="RfmAqs Sensor", Used=1).Create()
         unitIndex += 1
         Domoticz.Device(Name="AQS Temp & Humidity", DeviceID=deviceId, Unit=unitIndex,
-                        TypeName="Temp+Hum", Type=82,
+                        TypeName="Temp+Hum", Type=DeviceTypes.DEVICE_TYPE_TEMP_HUMIDITY,
                         Description="RfmAqs Temp & Humidity", Used=1).Create()
     elif(productId == PRODUCTID_EM):
         unitIndex += 1
@@ -118,7 +119,7 @@ def createEnergyMeasurements(deviceId, unitIndex):
     return unitIndex
 
 
-def updateDevice(device, productId, message):
+def updateDevice(devices, productId, message):
     if(productId == PRODUCTID_TEMPHUMIDITY):
         temperatureRecord = Common.findRecord(
             message, OpenThings.PARAM_TEMPERATURE)
@@ -131,15 +132,15 @@ def updateDevice(device, productId, message):
 
         temperature = ((175.72 * temperatureRecord["value"]) / 65536.0) - 46.85
 
-        Domoticz.Debug("Updating TempHumidity Sensor Id: [" + str(device.ID)
-                       + "] Temperature: [" + str(round(temperature, 2)) 
+        Domoticz.Debug("Updating TempHumidity Sensor Id: [" + str(devices[1].ID)
+                       + "] Temperature: [" + str(round(temperature, 2))
                        + "] Humidity: [" + str(round(humidity, 2))
                        + "] Battery Level: [" + batteryRecord["value"] + "]")
 
-        device.Update(nValue=int(temperature), sValue=str(
+        devices[1].Update(nValue=int(temperature), sValue=str(
             temperature) + ";" + str(humidity), BatteryLevel=batteryRecord["value"])
     elif(productId == PRODUCTID_AQS):
-        Domoticz.Log("Updating AQS Sensor Id: " + str(device.ID))
+        Domoticz.Log("Updating AQS Sensor Id: " + str(devices[1].ID))
         temperatureRecord = Common.findRecord(
             message, OpenThings.PARAM_TEMPERATURE)
         batteryRecord = Common.findRecord(
@@ -155,55 +156,58 @@ def updateDevice(device, productId, message):
 
         batteryLevel = batteryRecord["value"]
 
-        Domoticz.Debug("Updating AQS Sensor Id: [" + str(device.ID) 
+        Domoticz.Debug("Updating AQS Sensor Id: [" + str(devices[1].ID)
                        + "] AQS Index: [" + str(vocRecord["value"])
                        + "] Temperature: [" + str(round(temperature, 2))
                        + "] Humidity: [" + str(round(humidity, 2))
                        + "] Battery Level: [" + str(batteryRecord["value"]) + "]")
 
+        tempDevice = findDeviceByType()
+
+        aqsDevice = findDeviceByType()
         # device[1].Update(nValue=0, sValue=str(vocRecord["value"]),
         #                  BatteryLevel=batteryLevel)
         # device[2].Update(nValue=0, sValue=temperature + ";" +
         #                  humidity, BatteryLevel=batteryRecord["value"])
-    elif(productId == PRODUCTID_EM):
-        Domoticz.Log("Updating Energy Meter Id: " + str(device.ID))
-        voltageRecord = Common.findRecord(message, OpenThings.PARAM_VOLTAGE)
-        freqRecord = Common.findRecord(message, OpenThings.PARAM_FREQUENCY)
+    # elif(productId == PRODUCTID_EM):
+        # Domoticz.Log("Updating Energy Meter Id: " + str(device.ID))
+        # voltageRecord = Common.findRecord(message, OpenThings.PARAM_VOLTAGE)
+        # freqRecord = Common.findRecord(message, OpenThings.PARAM_FREQUENCY)
 
-        device[1].Update(sValue=voltageRecord["value"] / 100.0)
-        device[2].Update(nValue=freqRecord["value"] / 100.0)
+        # device[1].Update(sValue=voltageRecord["value"] / 100.0)
+        # device[2].Update(nValue=freqRecord["value"] / 100.0)
 
-        iRecord_L = Common.findRecord(message, OpenThings.PARAM_CURRENT_L)
-        phaseRecord_L = Common.findRecord(
-            message, OpenThings.PARAM_PHASE_ANGLE_L)
-        activePowerRecord_L = Common.findRecord(
-            message, OpenThings.PARAM_ACTIVE_POWER_L)
-        powerFactorRecord_L = Common.findRecord(
-            message, OpenThings.PARAM_POWER_FACTOR_L)
-        reactivePowerRecord_L = Common.findRecord(
-            message, OpenThings.PARAM_REACTIVE_POWER_L)
-        apparentPowerRecord_L = Common.findRecord(
-            message, OpenThings.PARAM_APPARENT_POWER_L)
+        # iRecord_L = Common.findRecord(message, OpenThings.PARAM_CURRENT_L)
+        # phaseRecord_L = Common.findRecord(
+        #     message, OpenThings.PARAM_PHASE_ANGLE_L)
+        # activePowerRecord_L = Common.findRecord(
+        #     message, OpenThings.PARAM_ACTIVE_POWER_L)
+        # powerFactorRecord_L = Common.findRecord(
+        #     message, OpenThings.PARAM_POWER_FACTOR_L)
+        # reactivePowerRecord_L = Common.findRecord(
+        #     message, OpenThings.PARAM_REACTIVE_POWER_L)
+        # apparentPowerRecord_L = Common.findRecord(
+        #     message, OpenThings.PARAM_APPARENT_POWER_L)
 
-        updateLineMeasurements(device, iRecord_L, phaseRecord_L, activePowerRecord_L,
-                               powerFactorRecord_L, reactivePowerRecord_L, apparentPowerRecord_L, 3)
+        # updateLineMeasurements(device, iRecord_L, phaseRecord_L, activePowerRecord_L,
+        #                        powerFactorRecord_L, reactivePowerRecord_L, apparentPowerRecord_L, 3)
 
-        iRecord_N = Common.findRecord(message, OpenThings.PARAM_CURRENT_N)
-        phaseRecord_N = Common.findRecord(
-            message, OpenThings.PARAM_PHASE_ANGLE_N)
-        activePowerRecord_N = Common.findRecord(
-            message, OpenThings.PARAM_ACTIVE_POWER_N)
-        powerFactorRecord_N = Common.findRecord(
-            message, OpenThings.PARAM_POWER_FACTOR_N)
-        reactivePowerRecord_N = Common.findRecord(
-            message, OpenThings.PARAM_REACTIVE_POWER_N)
-        apparentPowerRecord_N = Common.findRecord(
-            message, OpenThings.PARAM_APPARENT_POWER_N)
+        # iRecord_N = Common.findRecord(message, OpenThings.PARAM_CURRENT_N)
+        # phaseRecord_N = Common.findRecord(
+        #     message, OpenThings.PARAM_PHASE_ANGLE_N)
+        # activePowerRecord_N = Common.findRecord(
+        #     message, OpenThings.PARAM_ACTIVE_POWER_N)
+        # powerFactorRecord_N = Common.findRecord(
+        #     message, OpenThings.PARAM_POWER_FACTOR_N)
+        # reactivePowerRecord_N = Common.findRecord(
+        #     message, OpenThings.PARAM_REACTIVE_POWER_N)
+        # apparentPowerRecord_N = Common.findRecord(
+        #     message, OpenThings.PARAM_APPARENT_POWER_N)
 
-        updateLineMeasurements(device, iRecord_N, phaseRecord_N, activePowerRecord_N,
-                               powerFactorRecord_N, reactivePowerRecord_N, apparentPowerRecord_N, 9)
+        # updateLineMeasurements(device, iRecord_N, phaseRecord_N, activePowerRecord_N,
+        #                        powerFactorRecord_N, reactivePowerRecord_N, apparentPowerRecord_N, 9)
 
-        updateEnergyMeasurements(device, message)
+        # updateEnergyMeasurements(device, message)
 
 
 def updateLineMeasurements(device, currentRecord, phaseRecord, activePowerRecord,

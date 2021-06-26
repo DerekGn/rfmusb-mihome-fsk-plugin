@@ -204,7 +204,7 @@ class BasePlugin:
                 unitCount += 20
 
         Domoticz.Debug("UnitCount: " + str(unitCount))
-        
+
         return unitCount
 
     def sendCommand(self, Command):
@@ -237,11 +237,7 @@ class BasePlugin:
 
         Domoticz.Debug("DeviceId: " + deviceId)
 
-        device = self.findDevice(deviceId)
-
-        Domoticz.Debug("Device: " + str(device))
-
-        if(device is None):
+        if(self.deviceExists(deviceId)):
             join = Common.findRecord(message, OpenThings.PARAM_JOIN)
             Domoticz.Log("Join: " + str(join))
             if(join is not None):
@@ -249,27 +245,48 @@ class BasePlugin:
                 self.addDevice(manufacturerId, deviceId, productId)
         else:
             Domoticz.Debug("Updating Device DeviceId: "+str(deviceId))
-            self.updateDevice(manufacturerId, productId, device, message)
+            self.updateDevice(deviceId, manufacturerId, productId, message)
+
+    def addDevice(self, manufacturerId, deviceId, productId):
+        if(manufacturerId == Energine.MFRID_ENERGENIE):
+            self.UnitIndex = Energine.createDevice(
+                deviceId, productId, self.UnitIndex)
+        elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
+            self.UnitIndex = AxioLogix.createDevice(
+                deviceId, productId, self.UnitIndex)
+        else:
+            Domoticz.Error("Unknown Product Id: " + str(productId))
+
+    def updateDevice(self, deviceId, manufacturerId, productId, message):
+        if(manufacturerId == Energine.MFRID_ENERGENIE):
+            device = self.findDevice(deviceId)
+            if(device is not None):
+                Energine.updateDevice(device, productId, message)
+
+        elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
+            devices = self.findDevices(deviceId)
+            if(devices.count() != 0):
+                AxioLogix.updateDevice(devices, productId, message)
+
+    def findDevice(self, deviceId):
+        devices = []
+        for x in Devices:
+            if(Devices[x].DeviceID == deviceId):
+                devices.append(Devices[x])
+        
+        return devices
 
     def findDevice(self, deviceId):
         for x in Devices:
             if(Devices[x].DeviceID == deviceId):
                 return Devices[x]
+    
+    def deviceExists(self, deviceId):
+        for x in Devices:
+            if(Devices[x].DeviceID == deviceId):
+                return True
 
-    def addDevice(self, manufacturerId, deviceId, productId):
-        if(manufacturerId == Energine.MFRID_ENERGENIE):
-            self.UnitIndex = Energine.createDevice(deviceId, productId, self.UnitIndex)
-        elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
-            self.UnitIndex = AxioLogix.createDevice(deviceId, productId, self.UnitIndex)
-        else:
-            Domoticz.Error("Unknown Product Id: " + str(productId))
-
-    def updateDevice(self, manufacturerId, productId, device, message):
-        if(manufacturerId == Energine.MFRID_ENERGENIE):
-            Energine.updateDevice(device, productId, message)
-        elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
-            AxioLogix.updateDevice(device, productId, message)
-
+        return False
 
 global _plugin
 _plugin = BasePlugin()
@@ -314,6 +331,7 @@ def onDisconnect(Connection):
 def onHeartbeat():
     global _plugin
     _plugin.onHeartbeat()
+
 
 def onDeviceRemoved(Unit):
     Domoticz.Debug("Device Removed: " + str(Unit))

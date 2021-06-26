@@ -1,6 +1,8 @@
 # OpenThings.py  27/09/2015  D.J.Whale
 #
 # Implement OpenThings message encoding and decoding
+#
+# Decrypt based on encryptPIP value D.Goslin
 
 import time
 try:
@@ -158,7 +160,7 @@ def trace(msg):
 #we're trying to process an encrypted packet without decrypting it.
 #the code should be more robust to this (by checking the CRC)
 
-def decode(payload, decrypt=True):
+def decode(payload):
 	"""Decode a raw buffer into an OpenThings pydict"""
 	#Note, decrypt must already have run on this for it to work
 	length = payload[0]
@@ -184,7 +186,7 @@ def decode(payload, decrypt=True):
 	}
 
 
-	if decrypt:
+	if encryptPIP != 0:
 		# DECRYPT PAYLOAD
 		# [0]len,mfrid,productid,pipH,pipL,[5]
 		crypto.init(crypt_pid, encryptPIP)
@@ -193,7 +195,6 @@ def decode(payload, decrypt=True):
 	# sensorId is in encrypted region
 	sensorId = (payload[5]<<16) + (payload[6]<<8) + payload[7]
 	header["sensorid"] = sensorId
-
 
 	# CHECK CRC
 	crc_actual  = (payload[-2]<<8) + payload[-1]

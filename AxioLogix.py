@@ -175,7 +175,7 @@ def updateDevice(devices, productId, message):
                        + "] AQS Index: [" + str(vocRecord["value"])
                        + "] Temperature: [" + str(round(temperature, 2))
                        + "] Humidity: [" + str(round(humidity, 2))
-                       + "] Battery Level: [" + str(batteryRecord["value"]) + "]")
+                       + "] Battery Level: [" + str(batteryLevel) + "]")
 
         tempDevice = findDeviceByType(devices, DeviceTypes.DEVICE_TYPE_TEMP_HUMIDITY)
 
@@ -186,7 +186,7 @@ def updateDevice(devices, productId, message):
         aqsDevice = findDeviceByType(devices, DeviceTypes.DEVICE_TYPE_GENERAL)
 
         if(aqsDevice is not None):
-            aqsDevice.Update(nValue=vocRecord["value"], sValue=str(vocRecord["value"]),
+            aqsDevice.Update(nValue = 0, sValue = str(vocRecord["value"]), Options= {'Custom': '1;<axisUnits>'}, 
                               BatteryLevel=batteryLevel)
 
     # elif(productId == PRODUCTID_EM):

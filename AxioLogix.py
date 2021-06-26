@@ -31,7 +31,7 @@ def createDevice(deviceId, productId, unitIndex):
                         Options={'Custom': '1;VOC Index'},
                         Description="RfmAqs Sensor", Used=1).Create()
         unitIndex += 1
-        Domoticz.Device(Name="AQS Temp & Humidity", DeviceId=deviceId, Unit=unitIndex,
+        Domoticz.Device(Name="AQS Temp & Humidity", DeviceID=deviceId, Unit=unitIndex,
                         TypeName="Temp+Hum", Type=82,
                         Description="RfmAqs Temp & Humidity", Used=1).Create()
     elif(productId == PRODUCTID_EM):

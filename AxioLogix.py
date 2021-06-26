@@ -28,8 +28,8 @@ def createDevice(deviceId, productId, unitIndex):
         Domoticz.Log("Creating Aqs Sensor Id: " +
                      deviceId + " Unit Id: " + str(unitIndex))
         Domoticz.Device(Name="AQS", DeviceID=deviceId, Unit=unitIndex,
-                        Type=DeviceTypes.DEVICE_TYPE_AIRQUALITY,
-                        #Options={'Custom': '1;VOC Index'},
+                        Type=DeviceTypes.DEVICE_TYPE_GENERAL,
+                        Options={'Custom': '1;VOC Index'},
                         Description="RfmAqs Sensor", Used=1).Create()
         unitIndex += 1
         Domoticz.Device(Name="AQS Temp & Humidity", DeviceID=deviceId, Unit=unitIndex,
@@ -168,10 +168,10 @@ def updateDevice(devices, productId, message):
             tempDevice.Update(nValue=int(temperature), sValue=str(
                 temperature) + ";" + str(humidity), BatteryLevel=batteryRecord["value"])
 
-        aqsDevice = findDeviceByType(DeviceTypes.DEVICE_TYPE_AIRQUALITY)
+        aqsDevice = findDeviceByType(DeviceTypes.DEVICE_TYPE_GENERAL)
 
-        if(tempDevice is not None):
-            tempDevice.Update(nValue=vocRecord["value"], sValue=str(vocRecord["value"]),
+        if(aqsDevice is not None):
+            aqsDevice.Update(nValue=vocRecord["value"], sValue=str(vocRecord["value"]),
                               BatteryLevel=batteryLevel)
 
     # elif(productId == PRODUCTID_EM):

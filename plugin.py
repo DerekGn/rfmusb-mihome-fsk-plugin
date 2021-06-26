@@ -264,7 +264,7 @@ class BasePlugin:
                 Energine.updateDevice(device, productId, message)
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
             devices = self.findDevices(deviceId)
-            if(len(devices.count())):
+            if(len(devices.count()) > 0):
                 AxioLogix.updateDevice(devices, productId, message)
 
     def findDevices(self, deviceId):

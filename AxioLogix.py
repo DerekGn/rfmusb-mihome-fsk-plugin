@@ -13,16 +13,19 @@ PRODUCTID_TEMPHUMIDITY = 0x01
 PRODUCTID_AQS = 0x02
 PRODUCTID_EM = 0x03
 
+
 def createDevice(deviceId, productId, unitIndex):
     if(productId == PRODUCTID_TEMPHUMIDITY):
         unitIndex += 1
-        Domoticz.Log("Creating Temp Humidity Sensor Id: " + deviceId + " Unit Id: " + str(unitIndex))
+        Domoticz.Log("Creating Temp Humidity Sensor Id: " +
+                     deviceId + " Unit Id: " + str(unitIndex))
         Domoticz.Device(Name="Temp Humidity Sensor", DeviceID=deviceId, Unit=unitIndex,
                         TypeName="Temp+Hum", Type=82,
                         Description="RfmTemp Sensor", Used=1).Create()
     elif(productId == PRODUCTID_AQS):
         unitIndex += 1
-        Domoticz.Log("Creating Aqs Sensor Id: " + deviceId + " Unit Id: " + str(unitIndex))
+        Domoticz.Log("Creating Aqs Sensor Id: " +
+                     deviceId + " Unit Id: " + str(unitIndex))
         Domoticz.Device(Name="AQS", DeviceID=deviceId, Unit=unitIndex,
                         Type=243, Subtype=31,
                         Options={'Custom': '1;VOC Index'},
@@ -33,7 +36,8 @@ def createDevice(deviceId, productId, unitIndex):
                         Description="RfmAqs Temp & Humidity", Used=1).Create()
     elif(productId == PRODUCTID_EM):
         unitIndex += 1
-        Domoticz.Log("Creating Energy Meter Sensor Id: " + deviceId + " Unit Id: " + str(unitIndex))
+        Domoticz.Log("Creating Energy Meter Sensor Id: " +
+                     deviceId + " Unit Id: " + str(unitIndex))
         Domoticz.Device(Name="Energy Meter Voltage", DeviceID=deviceId, Unit=unitIndex,
                         Type=243, Subtype=31,
                         Options={'Custom': '1;VAC'},
@@ -43,7 +47,7 @@ def createDevice(deviceId, productId, unitIndex):
                         Type=243, Subtype=31,
                         Options={'Custom': '1;Hz'},
                         Description="Line Voltage Frequency", Used=1).Create()
-        
+
         unitIndex = createLineMeasurements('L', deviceId, unitIndex)
         unitIndex = createLineMeasurements('n', deviceId, unitIndex)
         unitIndex = createEnergyMeasurements(deviceId, unitIndex)
@@ -84,6 +88,7 @@ def createLineMeasurements(line, deviceId, unitIndex):
 
     return unitIndex
 
+
 def createEnergyMeasurements(deviceId, unitIndex):
     unitIndex += 1
     Domoticz.Device(Name="Energy Meter Absolute Active Energy", DeviceID=deviceId, Unit=unitIndex,
@@ -112,6 +117,7 @@ def createEnergyMeasurements(deviceId, unitIndex):
 
     return unitIndex
 
+
 def updateDevice(device, productId, message):
     if(productId == PRODUCTID_TEMPHUMIDITY):
         Domoticz.Log("Updating TempHumidity Sensor Id: " + str(device.ID))
@@ -128,8 +134,7 @@ def updateDevice(device, productId, message):
 
         # device.Update(nValue=0, sValue=temperature + ";" +
         #                  humidity, BatteryLevel=batteryRecord["value"])
-        device.Update(nValue=0, sValue=temperature + ";" +
-                         humidity)
+        device.Update(nValue=0, sValue=str(temperature) + ";" + str(humidity))
     elif(productId == PRODUCTID_AQS):
         Domoticz.Log("Updating AQS Sensor Id: " + str(device.ID))
         temperatureRecord = Common.findRecord(
@@ -207,22 +212,29 @@ def updateLineMeasurements(device, currentRecord, phaseRecord, activePowerRecord
     # Apparent Power
     device[unitIndex].Update(nValue=apparentPowerRecord["value"] / 1000.0)
 
+
 def updateEnergyMeasurements(device, message):
     # Absolute Active Energy
-    activeEnergy = Common.findRecord(message, OpenThings.PARAM_ABS_ACTIVE_ENERGY)
+    activeEnergy = Common.findRecord(
+        message, OpenThings.PARAM_ABS_ACTIVE_ENERGY)
     device[15].Update(nValue=activeEnergy["Value"])
     # Absolute Reactive Energy
-    reactiveEnergy = Common.findRecord(message, OpenThings.PARAM_ABS_REACTIVE_ENERGY)
+    reactiveEnergy = Common.findRecord(
+        message, OpenThings.PARAM_ABS_REACTIVE_ENERGY)
     device[16].Update(nValue=reactiveEnergy["Value"])
     # Forward Active Energy
-    fwdActiveEnergy = Common.findRecord(message, OpenThings.PARAM_FWD_ACTIVE_ENERGY)
+    fwdActiveEnergy = Common.findRecord(
+        message, OpenThings.PARAM_FWD_ACTIVE_ENERGY)
     device[17].Update(nValue=fwdActiveEnergy["Value"])
     # Forward Reactive Energy
-    fwdReactiveEnergy = Common.findRecord(message, OpenThings.PARAM_FWD_REACTIVE_ENERGY)
+    fwdReactiveEnergy = Common.findRecord(
+        message, OpenThings.PARAM_FWD_REACTIVE_ENERGY)
     device[18].Update(nValue=fwdReactiveEnergy["Value"])
     # Reverse Active Energy
-    revActiveEnergy = Common.findRecord(message, OpenThings.PARAM_REV_ACTIVE_ENERGY)
+    revActiveEnergy = Common.findRecord(
+        message, OpenThings.PARAM_REV_ACTIVE_ENERGY)
     device[19].Update(nValue=revActiveEnergy["Value"])
     # Reverse Reactive Energy
-    revReactiveEnergy = Common.findRecord(message, OpenThings.PARAM_REV_REACTIVE_ENERGY)
+    revReactiveEnergy = Common.findRecord(
+        message, OpenThings.PARAM_REV_REACTIVE_ENERGY)
     device[20].Update(nValue=revReactiveEnergy["Value"])

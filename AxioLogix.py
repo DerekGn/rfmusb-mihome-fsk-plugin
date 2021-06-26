@@ -134,7 +134,7 @@ def updateDevice(device, productId, message):
 
         # device.Update(nValue=0, sValue=temperature + ";" +
         #                  humidity, BatteryLevel=batteryRecord["value"])
-        device.Update(nValue=0, sValue=str(temperature) + ";" + str(humidity))
+        device.Update(nValue=temperature, sValue=str(temperature) + ";" + str(humidity))
     elif(productId == PRODUCTID_AQS):
         Domoticz.Log("Updating AQS Sensor Id: " + str(device.ID))
         temperatureRecord = Common.findRecord(

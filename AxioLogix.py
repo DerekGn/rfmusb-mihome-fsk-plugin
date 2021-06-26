@@ -29,6 +29,7 @@ def createDevice(deviceId, productId, unitIndex):
                      deviceId + " Unit Id: " + str(unitIndex))
         Domoticz.Device(Name="AQS", DeviceID=deviceId, Unit=unitIndex,
                         Type=DeviceTypes.DEVICE_TYPE_GENERAL,
+                        SubType = DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
                         Options={'Custom': '1;VOC Index'},
                         Description="RfmAqs Sensor", Used=1).Create()
         unitIndex += 1
@@ -40,12 +41,14 @@ def createDevice(deviceId, productId, unitIndex):
         Domoticz.Log("Creating Energy Meter Sensor Id: " +
                      deviceId + " Unit Id: " + str(unitIndex))
         Domoticz.Device(Name="Energy Meter Voltage", DeviceID=deviceId, Unit=unitIndex,
-                        Type=243, Subtype=31,
+                        Type=DeviceTypes.DEVICE_TYPE_GENERAL,
+                        SubType = DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
                         Options={'Custom': '1;VAC'},
                         Description="Rms Voltage", Used=1).Create()
         unitIndex += 1
         Domoticz.Device(Name="Energy Meter Frequency", DeviceID=deviceId, Unit=unitIndex,
-                        Type=243, Subtype=31,
+                        Type=DeviceTypes.DEVICE_TYPE_GENERAL,
+                        SubType = DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
                         Options={'Custom': '1;Hz'},
                         Description="Line Voltage Frequency", Used=1).Create()
 
@@ -59,31 +62,37 @@ def createDevice(deviceId, productId, unitIndex):
 def createLineMeasurements(line, deviceId, unitIndex):
     unitIndex += 1
     Domoticz.Device(Name="Energy Meter " + line + " Current", DeviceID=deviceId, Unit=unitIndex,
-                    Type=243, Subtype=31,
+                    Type=DeviceTypes.DEVICE_TYPE_GENERAL,
+                    SubType = DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
                     Options={'Custom': '1;Irms'},
                     Description=line + " Line Rms Current").Create()
     unitIndex += 1
     Domoticz.Device(Name="Energy Meter " + line + " Phase", DeviceID=deviceId, Unit=unitIndex,
-                    Type=243, Subtype=31,
+                    Type=DeviceTypes.DEVICE_TYPE_GENERAL,
+                    SubType = DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
                     Options={'Custom': '1;°'},
                     Description="Phase Angle between Voltage and " + line + " Line Current").Create()
     unitIndex += 1
     Domoticz.Device(Name="Energy Meter " + line + " PMean", DeviceID=deviceId, Unit=unitIndex,
-                    Type=243, Subtype=31,
+                    Type=DeviceTypes.DEVICE_TYPE_GENERAL,
+                    SubType = DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
                     Options={'Custom': '1;kW'},
                     Description=line + " Line Mean Active Power").Create()
     unitIndex += 1
     Domoticz.Device(Name="Energy Meter " + line + " QMean", DeviceID=deviceId, Unit=unitIndex,
-                    Type=243, Subtype=31,
+                    Type=DeviceTypes.DEVICE_TYPE_GENERAL,
+                    SubType = DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
                     Options={'Custom': '1;kvar'},
                     Description=line + " Line Mean Reactive Power").Create()
     unitIndex += 1
     Domoticz.Device(Name="Energy Meter " + line + "Power Factor", DeviceID=deviceId, Unit=unitIndex,
-                    Type=243, Subtype=31,
+                    Type=DeviceTypes.DEVICE_TYPE_GENERAL,
+                    SubType = DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
                     Description=line + " Line Power Factor").Create()
     unitIndex += 1
     Domoticz.Device(Name="Energy Meter " + line + " SMean", DeviceID=deviceId, Unit=unitIndex,
-                    Type=243, Subtype=31,
+                    Type=DeviceTypes.DEVICE_TYPE_GENERAL,
+                    SubType = DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
                     Options={'Custom': '1;kVA'},
                     Description=line + " Line Mean Apparent Power").Create()
 
@@ -93,27 +102,33 @@ def createLineMeasurements(line, deviceId, unitIndex):
 def createEnergyMeasurements(deviceId, unitIndex):
     unitIndex += 1
     Domoticz.Device(Name="Energy Meter Absolute Active Energy", DeviceID=deviceId, Unit=unitIndex,
-                    Type=243, Subtype=28,
+                    Type=DeviceTypes.DEVICE_TYPE_GENERAL,
+                    SubType = DeviceTypes.DEVICE_SUB_TYPE_COUNTER_INC,
                     Description="Energy Meter Absolute Active Energy").Create()
     unitIndex += 1
     Domoticz.Device(Name="Energy Meter Absolute Reactive Energy", DeviceID=deviceId, Unit=unitIndex,
-                    Type=243, Subtype=28,
+                    Type=DeviceTypes.DEVICE_TYPE_GENERAL,
+                    SubType = DeviceTypes.DEVICE_SUB_TYPE_COUNTER_INC,
                     Description="Energy Meter Absolute Reactive Energy").Create()
     unitIndex += 1
     Domoticz.Device(Name="Energy Meter Forward Active Energy", DeviceID=deviceId, Unit=unitIndex,
-                    Type=243, Subtype=28,
+                    Type=DeviceTypes.DEVICE_TYPE_GENERAL,
+                    SubType = DeviceTypes.DEVICE_SUB_TYPE_COUNTER_INC,
                     Description="Energy Meter Forward Active Energy").Create()
     unitIndex += 1
     Domoticz.Device(Name="Energy Meter Forward Reactive Energy", DeviceID=deviceId, Unit=unitIndex,
-                    Type=243, Subtype=28,
+                    Type=DeviceTypes.DEVICE_TYPE_GENERAL,
+                    SubType = DeviceTypes.DEVICE_SUB_TYPE_COUNTER_INC,
                     Description="Energy Meter Forward Reactive Energy").Create()
     unitIndex += 1
     Domoticz.Device(Name="Energy Meter Reverse Active Energy", DeviceID=deviceId, Unit=unitIndex,
-                    Type=243, Subtype=28,
+                    Type=DeviceTypes.DEVICE_TYPE_GENERAL,
+                    SubType = DeviceTypes.DEVICE_SUB_TYPE_COUNTER_INC,
                     Description="Energy Meter Reverse Active Energy").Create()
     unitIndex += 1
     Domoticz.Device(Name="Energy Meter Reverse Reactive Energy", DeviceID=deviceId, Unit=unitIndex,
-                    Type=243, Subtype=28,
+                    Type=DeviceTypes.DEVICE_TYPE_GENERAL,
+                    SubType = DeviceTypes.DEVICE_SUB_TYPE_COUNTER_INC,
                     Description="Energy Meter Reverse Reactive Energy").Create()
 
     return unitIndex

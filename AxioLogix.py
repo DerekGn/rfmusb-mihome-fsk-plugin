@@ -28,8 +28,8 @@ def createDevice(deviceId, productId, unitIndex):
         Domoticz.Log("Creating Aqs Sensor Id: " +
                      deviceId + " Unit Id: " + str(unitIndex))
         Domoticz.Device(Name="AQS", DeviceID=deviceId, Unit=unitIndex,
-                        Type=DeviceTypes.DEVICE_TYPE_AIRQUALITY, Subtype=31,
-                        Options={'Custom': '1;VOC Index'},
+                        Type=DeviceTypes.DEVICE_TYPE_AIRQUALITY,
+                        #Options={'Custom': '1;VOC Index'},
                         Description="RfmAqs Sensor", Used=1).Create()
         unitIndex += 1
         Domoticz.Device(Name="AQS Temp & Humidity", DeviceID=deviceId, Unit=unitIndex,
@@ -162,13 +162,18 @@ def updateDevice(devices, productId, message):
                        + "] Humidity: [" + str(round(humidity, 2))
                        + "] Battery Level: [" + str(batteryRecord["value"]) + "]")
 
-        tempDevice = findDeviceByType()
+        tempDevice = findDeviceByType(DeviceTypes.DEVICE_TYPE_TEMP_HUMIDITY)
 
-        aqsDevice = findDeviceByType()
-        # device[1].Update(nValue=0, sValue=str(vocRecord["value"]),
-        #                  BatteryLevel=batteryLevel)
-        # device[2].Update(nValue=0, sValue=temperature + ";" +
-        #                  humidity, BatteryLevel=batteryRecord["value"])
+        if(tempDevice is not None):
+            tempDevice.Update(nValue=int(temperature), sValue=str(
+                temperature) + ";" + str(humidity), BatteryLevel=batteryRecord["value"])
+
+        aqsDevice = findDeviceByType(DeviceTypes.DEVICE_TYPE_AIRQUALITY)
+
+        if(tempDevice is not None):
+            tempDevice.Update(nValue=vocRecord["value"], sValue=str(vocRecord["value"]),
+                              BatteryLevel=batteryLevel)
+
     # elif(productId == PRODUCTID_EM):
         # Domoticz.Log("Updating Energy Meter Id: " + str(device.ID))
         # voltageRecord = Common.findRecord(message, OpenThings.PARAM_VOLTAGE)
@@ -211,9 +216,9 @@ def updateDevice(devices, productId, message):
 
 
 def updateLineMeasurements(device, currentRecord, phaseRecord, activePowerRecord,
-                           powerFactorRecord, reactivePowerRecord, apparentPowerRecord, unit):
+                           powerFactorRecord, reactivePowerRecord, apparentPowerRecord, unitIndex):
     # Current
-    device[unit].Update(nValue=currentRecord["value"] / 1000.0)
+    device[unitIndex].Update(nValue=currentRecord["value"] / 1000.0)
     # Phase
     device[unitIndex].Update(nValue=phaseRecord["value"] / 10.0)
     # Mean Active Power
@@ -251,3 +256,9 @@ def updateEnergyMeasurements(device, message):
     revReactiveEnergy = Common.findRecord(
         message, OpenThings.PARAM_REV_REACTIVE_ENERGY)
     device[20].Update(nValue=revReactiveEnergy["Value"])
+
+
+def findDeviceByType(devices, deviceType):
+    for x in devices:
+        if(devices[x].Type == deviceType):
+            return devices[x]

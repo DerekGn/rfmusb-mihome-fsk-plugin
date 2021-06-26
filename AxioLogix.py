@@ -131,8 +131,10 @@ def updateDevice(device, productId, message):
 
         temperature = ((175.72 * temperatureRecord["value"]) / 65536.0) - 46.85
 
-        Domoticz.Debug("Updating TempHumidity Sensor Id: " + str(device.ID) + " Temperature: [" + str(round(temperature, 2)) +
-                       "] Humidity: [" + str(round(humidity, 2)) + "]")
+        Domoticz.Debug("Updating TempHumidity Sensor Id: [" + str(device.ID)
+                       + "] Temperature: [" + str(round(temperature, 2)) 
+                       + "] Humidity: [" + str(round(humidity, 2))
+                       + "] Battery Level: [" + batteryRecord["value"] + "]")
 
         device.Update(nValue=int(temperature), sValue=str(
             temperature) + ";" + str(humidity), BatteryLevel=batteryRecord["value"])
@@ -153,10 +155,16 @@ def updateDevice(device, productId, message):
 
         batteryLevel = batteryRecord["value"]
 
-        device[1].Update(nValue=0, sValue=vocRecord["value"],
-                         BatteryLevel=batteryLevel)
-        device[2].Update(nValue=0, sValue=temperature + ";" +
-                         humidity, BatteryLevel=batteryRecord["value"])
+        Domoticz.Debug("Updating AQS Sensor Id: [" + str(device.ID) 
+                       + "] AQS Index: [" + str(vocRecord["value"])
+                       + "] Temperature: [" + str(round(temperature, 2))
+                       + "] Humidity: [" + str(round(humidity, 2))
+                       + "] Battery Level: [" + str(batteryRecord["value"]) + "]")
+
+        # device[1].Update(nValue=0, sValue=str(vocRecord["value"]),
+        #                  BatteryLevel=batteryLevel)
+        # device[2].Update(nValue=0, sValue=temperature + ";" +
+        #                  humidity, BatteryLevel=batteryRecord["value"])
     elif(productId == PRODUCTID_EM):
         Domoticz.Log("Updating Energy Meter Id: " + str(device.ID))
         voltageRecord = Common.findRecord(message, OpenThings.PARAM_VOLTAGE)

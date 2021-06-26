@@ -237,7 +237,7 @@ class BasePlugin:
 
         Domoticz.Debug("DeviceId: " + deviceId)
 
-        if(self.deviceExists(deviceId)):
+        if(not self.deviceExists(deviceId)):
             join = Common.findRecord(message, OpenThings.PARAM_JOIN)
             Domoticz.Log("Join: " + str(join))
             if(join is not None):

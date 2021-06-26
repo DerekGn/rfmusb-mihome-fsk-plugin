@@ -177,13 +177,13 @@ def updateDevice(devices, productId, message):
                        + "] Humidity: [" + str(round(humidity, 2))
                        + "] Battery Level: [" + str(batteryRecord["value"]) + "]")
 
-        tempDevice = findDeviceByType(DeviceTypes.DEVICE_TYPE_TEMP_HUMIDITY)
+        tempDevice = findDeviceByType(devices, DeviceTypes.DEVICE_TYPE_TEMP_HUMIDITY)
 
         if(tempDevice is not None):
             tempDevice.Update(nValue=int(temperature), sValue=str(
                 temperature) + ";" + str(humidity), BatteryLevel=batteryRecord["value"])
 
-        aqsDevice = findDeviceByType(DeviceTypes.DEVICE_TYPE_GENERAL)
+        aqsDevice = findDeviceByType(devices, DeviceTypes.DEVICE_TYPE_GENERAL)
 
         if(aqsDevice is not None):
             aqsDevice.Update(nValue=vocRecord["value"], sValue=str(vocRecord["value"]),

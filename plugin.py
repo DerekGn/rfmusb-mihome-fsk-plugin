@@ -120,7 +120,7 @@ class BasePlugin:
 
         DumpConfigToLog()
 
-        UnitIndex = self.getUnitIndex()
+        self.UnitIndex = self.getUnitIndex()
 
         OpenThings.init(242)
         SerialConn = Domoticz.Connection(Name="Serial Connection", Transport="Serial",

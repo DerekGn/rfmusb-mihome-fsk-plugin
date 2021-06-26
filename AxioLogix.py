@@ -117,8 +117,8 @@ def updateDevice(device, productId, message):
         Domoticz.Log("Updating TempHumidity Sensor Id: " + str(device.ID))
         temperatureRecord = Common.findRecord(
             message, OpenThings.PARAM_TEMPERATURE)
-        batteryRecord = Common.findRecord(
-            message, OpenThings.PARAM_BATTERY_LEVEL)
+        # batteryRecord = Common.findRecord(
+        #     message, OpenThings.PARAM_BATTERY_LEVEL)
         humidityRecord = Common.findRecord(
             message, OpenThings.PARAM_RELATIVE_HUMIDITY)
 
@@ -126,8 +126,10 @@ def updateDevice(device, productId, message):
 
         temperature = ((175.72 * temperatureRecord["value"]) / 65536.0) - 46.85
 
-        device[1].Update(nValue=0, sValue=temperature + ";" +
-                         humidity, BatteryLevel=batteryRecord["value"])
+        # device.Update(nValue=0, sValue=temperature + ";" +
+        #                  humidity, BatteryLevel=batteryRecord["value"])
+        device.Update(nValue=0, sValue=temperature + ";" +
+                         humidity)
     elif(productId == PRODUCTID_AQS):
         Domoticz.Log("Updating AQS Sensor Id: " + str(device.ID))
         temperatureRecord = Common.findRecord(

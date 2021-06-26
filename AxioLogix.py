@@ -275,5 +275,5 @@ def updateEnergyMeasurements(device, message):
 
 def findDeviceByType(devices, deviceType):
     for x in devices:
-        if(devices[x].Type == deviceType):
-            return devices[x]
+        if(x.Type == deviceType):
+            return x

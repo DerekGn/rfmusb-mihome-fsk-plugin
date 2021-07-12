@@ -221,6 +221,8 @@ class BasePlugin:
                                                      b for b in message))
                 openthingsMessage = OpenThings.decode(message)
                 self.handleMessage(openthingsMessage)
+            else:
+                Domoticz.Debug("Received Message Length out of range: " + str(length))
         except OpenThings.OpenThingsException as error:
             errorMessage = str(error)
             if("bad CRC" not in errorMessage):

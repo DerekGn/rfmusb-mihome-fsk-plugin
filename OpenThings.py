@@ -221,7 +221,7 @@ def decode(payload):
 	#trace("crc actual:%s, expected:%s" %(hex(crc_actual), hex(crc_expected)))
 
 	if crc_actual != crc_expected:
-		raise OpenThingsException("bad CRC")
+		raise OpenThingsException("bad CRC Expected: [" + hex(crc_expected) + "] Actual: [" + hex(crc_actual) + "]")
 		#return {
 		#	"type":         "BADCRC",
 		#	"crc_actual":   crc_actual,

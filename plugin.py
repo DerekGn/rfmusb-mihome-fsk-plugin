@@ -225,6 +225,9 @@ class BasePlugin:
                 Domoticz.Debug("Received Message Length out of range: " + str(length))
         except OpenThings.OpenThingsException as error:
             errorMessage = str(error)
+            
+            Domoticz.Debug("Error Occurred: " + errorMessage)
+
             if("bad CRC" not in errorMessage):
                 Domoticz.Error("Unable to decode payload: " + errorMessage)
 

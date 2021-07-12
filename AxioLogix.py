@@ -150,7 +150,7 @@ def updateDevice(devices, productId, message):
         Domoticz.Debug("Updating TempHumidity Sensor Id: [" + str(devices[1].ID)
                        + "] Temperature: [" + str(round(temperature, 2))
                        + "] Humidity: [" + str(round(humidity, 2))
-                       + "] Battery Level: [" + batteryRecord["value"] + "]")
+                       + "] Battery Level: [" + str(batteryRecord["value"]) + "]")
 
         devices[1].Update(nValue=int(temperature), sValue=str(
             temperature) + ";" + str(humidity), BatteryLevel=batteryRecord["value"])

@@ -265,7 +265,7 @@ class BasePlugin:
             if(device is not None):
                 Energine.updateDevice(device, productId, message)
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
-            childDevices = self.findChildDevices(productId, deviceId)
+            childDevices = self.findChildDevices(deviceId)
             if(len(childDevices) > 0):
                 AxioLogix.updateDevice(childDevices, productId, message)
 

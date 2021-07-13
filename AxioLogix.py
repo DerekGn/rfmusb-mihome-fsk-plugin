@@ -134,7 +134,7 @@ def createEnergyMeasurements(deviceId, unitIndex):
     return unitIndex
 
 
-def updateDevice(devices, productId, message):
+def updateDevice(childDevices, productId, message):
     if(productId == PRODUCTID_TEMPHUMIDITY):
         temperatureRecord = Common.findRecord(
             message, OpenThings.PARAM_TEMPERATURE)
@@ -149,15 +149,19 @@ def updateDevice(devices, productId, message):
 
         batteryLevel = batteryRecord["value"]
 
-        Domoticz.Debug("Updating TempHumidity Sensor Id: [" + str(devices[1].ID)
+        tempDevice = findDeviceByType(
+            childDevices, DeviceTypes.DEVICE_TYPE_TEMP_HUMIDITY)
+
+        Domoticz.Debug("Updating TempHumidity Sensor Id: [" + str(tempDevice.ID)
                        + "] Temperature: [" + str(round(temperature, 2))
                        + "] Humidity: [" + str(round(humidity, 2))
                        + "] Battery Level: [" + str(batteryLevel) + "]")
 
-        devices[1].Update(nValue=int(temperature), sValue=str(
-            temperature) + ";" + str(humidity), BatteryLevel=batteryLevel)
+        if(tempDevice is not None):
+            tempDevice.Update(nValue=int(temperature), sValue=str(
+                temperature) + ";" + str(humidity), BatteryLevel=batteryLevel)
     elif(productId == PRODUCTID_AQS):
-        Domoticz.Log("Updating AQS Sensor Id: " + str(devices[1].ID))
+        Domoticz.Log("Updating AQS Sensor Id: " + str(childDevices[1].ID))
         temperatureRecord = Common.findRecord(
             message, OpenThings.PARAM_TEMPERATURE)
         batteryRecord = Common.findRecord(
@@ -173,20 +177,20 @@ def updateDevice(devices, productId, message):
 
         batteryLevel = batteryRecord["value"]
 
-        Domoticz.Debug("Updating AQS Sensor Id: [" + str(devices[1].ID)
+        Domoticz.Debug("Updating AQS Sensor Id: [" + str(childDevices[1].ID)
                        + "] AQS Index: [" + str(vocRecord["value"])
                        + "] Temperature: [" + str(round(temperature, 2))
                        + "] Humidity: [" + str(round(humidity, 2))
                        + "] Battery Level: [" + str(batteryLevel) + "]")
 
         tempDevice = findDeviceByType(
-            devices, DeviceTypes.DEVICE_TYPE_TEMP_HUMIDITY)
+            childDevices, DeviceTypes.DEVICE_TYPE_TEMP_HUMIDITY)
 
         if(tempDevice is not None):
             tempDevice.Update(nValue=int(temperature), sValue=str(
                 temperature) + ";" + str(humidity), BatteryLevel=batteryLevel)
 
-        aqsDevice = findDeviceByType(devices, DeviceTypes.DEVICE_TYPE_GENERAL)
+        aqsDevice = findDeviceByType(childDevices, DeviceTypes.DEVICE_TYPE_GENERAL)
 
         if(aqsDevice is not None):
             aqsDevice.Update(nValue=int(vocRecord["value"]),

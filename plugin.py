@@ -222,7 +222,8 @@ class BasePlugin:
                 openthingsMessage = OpenThings.decode(message)
                 self.handleMessage(openthingsMessage)
             else:
-                Domoticz.Debug("Received Message Length out of range: " + str(length))
+                Domoticz.Debug(
+                    "Received Message Length out of range: " + str(length))
         except OpenThings.OpenThingsException as error:
             errorMessage = str(error)
             Domoticz.Error("Unable to decode payload: " + errorMessage)
@@ -270,23 +271,27 @@ class BasePlugin:
 
     def findChildDevices(self, productId, deviceId):
         devices = []
+        searchId = str(productId) + ":" + str(deviceId)
         for x in Devices:
-            if(str(productId) + ":" + str(deviceId) in Devices[x].DeviceID):
+            Domoticz.Debug(
+                "Device Id: [" + Devices[x].DeviceID + "] Search Id: [" + searchId + "]")
+            if(searchId in Devices[x].DeviceID):
                 devices.append(Devices[x])
-        
+
         return devices
 
     def findDevice(self, deviceId):
         for x in Devices:
             if(Devices[x].DeviceID == deviceId):
                 return Devices[x]
-    
+
     def deviceExists(self, deviceId):
         for x in Devices:
             if(Devices[x].DeviceID == deviceId):
                 return True
 
         return False
+
 
 global _plugin
 _plugin = BasePlugin()

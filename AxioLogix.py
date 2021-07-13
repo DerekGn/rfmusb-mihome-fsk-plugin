@@ -152,12 +152,12 @@ def updateDevice(childDevices, productId, message):
         tempDevice = findDeviceByType(
             childDevices, DeviceTypes.DEVICE_TYPE_TEMP_HUMIDITY)
 
-        Domoticz.Debug("Updating TempHumidity Sensor Id: [" + str(tempDevice.ID)
+        if(tempDevice is not None):
+            Domoticz.Debug("Updating TempHumidity Sensor Id: [" + str(tempDevice.ID)
                        + "] Temperature: [" + str(round(temperature, 2))
                        + "] Humidity: [" + str(round(humidity, 2))
                        + "] Battery Level: [" + str(batteryLevel) + "]")
 
-        if(tempDevice is not None):
             tempDevice.Update(nValue=int(temperature), sValue=str(
                 temperature) + ";" + str(humidity), BatteryLevel=batteryLevel)
     elif(productId == PRODUCTID_AQS):

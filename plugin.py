@@ -269,13 +269,12 @@ class BasePlugin:
             if(len(childDevices) > 0):
                 AxioLogix.updateDevice(childDevices, productId, message)
 
-    def findChildDevices(self, productId, deviceId):
+    def findChildDevices(self, deviceId):
         devices = []
-        searchId = str(productId) + ":" + str(deviceId)
         for x in Devices:
             Domoticz.Debug(
-                "Device Id: [" + Devices[x].DeviceID + "] Search Id: [" + searchId + "]")
-            if(searchId in Devices[x].DeviceID):
+                "Device Id: [" + Devices[x].DeviceID + "] Search Id: [" + deviceId + "]")
+            if(Devices[x].DeviceID == deviceId):
                 devices.append(Devices[x])
 
         return devices

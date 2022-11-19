@@ -74,7 +74,7 @@
     </params>
 </plugin>
 """
-import Domoticz
+import DomoticzEx
 import OpenThings
 import AxioLogix
 import Energine
@@ -350,13 +350,17 @@ def onDeviceRemoved(Unit):
 def DumpConfigToLog():
     for x in Parameters:
         if Parameters[x] != "":
-            Domoticz.Debug("'" + x + "':'" + str(Parameters[x]) + "'")
+            Domoticz.Debug( "'" + x + "':'" + str(Parameters[x]) + "'")
     Domoticz.Debug("Device count: " + str(len(Devices)))
-    for x in Devices:
-        Domoticz.Debug("Device:           " + str(x) + " - " + str(Devices[x]))
-        Domoticz.Debug("Device ID:       '" + str(Devices[x].ID) + "'")
-        Domoticz.Debug("Device Name:     '" + Devices[x].Name + "'")
-        Domoticz.Debug("Device nValue:    " + str(Devices[x].nValue))
-        Domoticz.Debug("Device sValue:   '" + Devices[x].sValue + "'")
-        Domoticz.Debug("Device LastLevel: " + str(Devices[x].LastLevel))
+    for DeviceName in Devices:
+        Device = Devices[DeviceName]
+        Domoticz.Debug("Device ID:       '" + str(Device.DeviceID) + "'")
+        Domoticz.Debug("--->Unit Count:      '" + str(len(Device.Units)) + "'")
+        for UnitNo in Device.Units:
+            Unit = Device.Units[UnitNo]
+            Domoticz.Debug("--->Unit:           " + str(UnitNo))
+            Domoticz.Debug("--->Unit Name:     '" + Unit.Name + "'")
+            Domoticz.Debug("--->Unit nValue:    " + str(Unit.nValue))
+            Domoticz.Debug("--->Unit sValue:   '" + Unit.sValue + "'")
+            Domoticz.Debug("--->Unit LastLevel: " + str(Unit.LastLevel))
     return

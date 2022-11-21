@@ -23,26 +23,26 @@ def createDevice(deviceId, productId):
                         Description="RfmTemp Sensor", Used=1).Create()
     elif(productId == PRODUCTID_AQS):
         Domoticz.Log("Creating Aqs Sensor Id: " + deviceId)
-        # Domoticz.Device(Name="AQS", DeviceID=deviceId, Unit=unitIndex,
-        #                 Type=DeviceTypes.DEVICE_TYPE_GENERAL,
-        #                 Subtype=DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
-        #                 Options={'Custom': '1;VOC Index'},
-        #                 Description="RfmAqs Sensor", Used=1).Create()
-        # Domoticz.Device(Name="AQS Temp & Humidity", DeviceID=deviceId, Unit=unitIndex,
-        #                 TypeName="Temp+Hum", Type=DeviceTypes.DEVICE_TYPE_TEMP_HUMIDITY,
-        #                 Description="RfmAqs Temp & Humidity", Used=1).Create()
+        Domoticz.Unit(Name="AQS", DeviceID=deviceId, Unit=1,
+                        Type=DeviceTypes.DEVICE_TYPE_GENERAL,
+                        Subtype=DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
+                        Options={'Custom': '1;VOC Index'},
+                        Description="RfmAqs Sensor", Used=1).Create()
+        Domoticz.Unit(Name="AQS Temp & Humidity", DeviceID=deviceId, Unit=2,
+                        TypeName="Temp+Hum", Type=DeviceTypes.DEVICE_TYPE_TEMP_HUMIDITY,
+                        Description="RfmAqs Temp & Humidity", Used=1).Create()
     elif(productId == PRODUCTID_EM):
         Domoticz.Log("Creating Energy Meter Sensor Id: " + deviceId)
-        # Domoticz.Device(Name="Energy Meter Voltage", DeviceID=deviceId, Unit=unitIndex,
-        #                 Type=DeviceTypes.DEVICE_TYPE_GENERAL,
-        #                 Subtype=DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
-        #                 Options={'Custom': '1;VAC'},
-        #                 Description="Rms Voltage", Used=1).Create()
-        # Domoticz.Device(Name="Energy Meter Frequency", DeviceID=deviceId, Unit=unitIndex,
-        #                 Type=DeviceTypes.DEVICE_TYPE_GENERAL,
-        #                 Subtype=DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
-        #                 Options={'Custom': '1;Hz'},
-        #                 Description="Line Voltage Frequency", Used=1).Create()
+        Domoticz.Device(Name="Energy Meter Voltage", DeviceID=deviceId, Unit=1,
+                        Type=DeviceTypes.DEVICE_TYPE_GENERAL,
+                        Subtype=DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
+                        Options={'Custom': '1;VAC'},
+                        Description="Rms Voltage", Used=1).Create()
+        Domoticz.Device(Name="Energy Meter Frequency", DeviceID=deviceId, Unit=2,
+                        Type=DeviceTypes.DEVICE_TYPE_GENERAL,
+                        Subtype=DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
+                        Options={'Custom': '1;Hz'},
+                        Description="Line Voltage Frequency", Used=1).Create()
 
         createLineMeasurements(deviceId, 'L')
         createLineMeasurements(deviceId, 'n')
@@ -117,9 +117,21 @@ def updateDevice(deviceId, productId, message):
 
 def updateTemperatureHumiditySensor(deviceId, message):
     Domoticz.Log("Updating Temperature Humidity Sensor Id: " + deviceId)
+    batteryRecord = Common.findRecord(message, OpenThings.PARAM_BATTERY_LEVEL)
+    temperatureRecord = Common.findRecord(message, OpenThings.PARAM_TEMPERATURE)
+    humidityRecord = Common.findRecord(message, OpenThings.PARAM_RELATIVE_HUMIDITY)
+
+    Domoticz.Debug("Updating TempHumidity Sensor Id: [" + deviceId
+                       + "] Temperature: [" + str(round(temperatureRecord["value"], 2))
+                       + "] Humidity: [" + str(round(humidityRecord["value"], 2))
+                       + "] Battery Level: [" + str(batteryRecord["value"]) + "]")
+    
+
 
 def updateAqsSensor(deviceId, message):
     Domoticz.Log("Updating AQS Sensor Id: " + deviceId)
+    
+
 
 def updateEnergyMeterSensor(deviceId, message):
     Domoticz.Log("Updating Energy Meter Sensor Id: " + deviceId)

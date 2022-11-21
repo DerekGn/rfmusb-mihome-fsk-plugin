@@ -124,8 +124,6 @@ class BasePlugin:
             Domoticz.Debugging(int(Parameters["Mode6"]))
             DumpConfigToLog()
 
-        self.UnitIndex = self.getUnitIndex()
-
         OpenThings.init(242)
         SerialConn = Domoticz.Connection(Name="Serial Connection", Transport="Serial",
                                          Protocol="None", Address=Parameters["SerialPort"], Baud=115200)
@@ -238,12 +236,12 @@ class BasePlugin:
         if(manufacturerId == Energine.MFRID_ENERGENIE):
             Energine.createDevice(deviceId, productId)
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
-            self.UnitIndex = AxioLogix.createDevice(deviceId, productId)
+            AxioLogix.createDevice(deviceId, productId)
         else:
             Domoticz.Error("Unknown Product Id: " + str(productId))
 
     def updateDevice(self, deviceId, manufacturerId, productId, message):
-        device = self.findDevice(productId, deviceId)
+        device = self.findDevice(deviceId)
         if(device is not None):
             if(manufacturerId == Energine.MFRID_ENERGENIE):
                 Energine.updateDevice(device, productId, message)

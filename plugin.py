@@ -74,7 +74,7 @@
     </params>
 </plugin>
 """
-import DomoticzEx
+import DomoticzEx as Domoticz
 import OpenThings
 import AxioLogix
 import Energine
@@ -111,7 +111,6 @@ class BasePlugin:
         "s-op"
     ]
 
-    UnitIndex = 0
     LastCommand = ""
     CommandIndex = 0
     SerialConn = None
@@ -193,25 +192,6 @@ class BasePlugin:
         pass
 
     # Support functions
-    def getUnitIndex(self):
-        unitCount = 0
-        for x in Devices:
-            deviceId = str(Devices[x].DeviceID)
-            if(deviceId.startswith(str(Energine.PRODUCTID_MIHO032))):
-                unitCount += 1
-            elif(deviceId.startswith(str(Energine.PRODUCTID_MIHO033))):
-                unitCount += 1
-            elif(deviceId.startswith(str(AxioLogix.PRODUCTID_TEMPHUMIDITY))):
-                unitCount += 1
-            elif(deviceId.startswith(str(AxioLogix.PRODUCTID_AQS))):
-                unitCount += 2
-            elif(deviceId.startswith(str(AxioLogix.PRODUCTID_EM))):
-                unitCount += 20
-
-        Domoticz.Debug("UnitCount: " + str(unitCount))
-
-        return unitCount
-
     def sendCommand(self, Command):
         self.LastCommand = Command
         self.SerialConn.Send(Command + "\n")
@@ -256,33 +236,19 @@ class BasePlugin:
 
     def addDevice(self, manufacturerId, deviceId, productId):
         if(manufacturerId == Energine.MFRID_ENERGENIE):
-            self.UnitIndex = Energine.createDevice(
-                deviceId, productId, self.UnitIndex)
+            Energine.createDevice(deviceId, productId)
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
-            self.UnitIndex = AxioLogix.createDevice(
-                deviceId, productId, self.UnitIndex)
+            self.UnitIndex = AxioLogix.createDevice(deviceId, productId)
         else:
             Domoticz.Error("Unknown Product Id: " + str(productId))
 
     def updateDevice(self, deviceId, manufacturerId, productId, message):
-        if(manufacturerId == Energine.MFRID_ENERGENIE):
-            device = self.findDevice(productId, deviceId)
-            if(device is not None):
+        device = self.findDevice(productId, deviceId)
+        if(device is not None):
+            if(manufacturerId == Energine.MFRID_ENERGENIE):
                 Energine.updateDevice(device, productId, message)
-        elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
-            childDevices = self.findChildDevices(deviceId)
-            if(len(childDevices) > 0):
-                AxioLogix.updateDevice(childDevices, productId, message)
-
-    def findChildDevices(self, deviceId):
-        devices = []
-        for x in Devices:
-            Domoticz.Debug(
-                "Device Id: [" + Devices[x].DeviceID + "] Search Id: [" + deviceId + "]")
-            if(Devices[x].DeviceID == deviceId):
-                devices.append(Devices[x])
-
-        return devices
+            elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
+                AxioLogix.updateDevice(device, productId, message)
 
     def findDevice(self, deviceId):
         for x in Devices:

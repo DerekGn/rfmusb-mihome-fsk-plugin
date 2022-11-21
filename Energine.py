@@ -2,9 +2,8 @@
 #
 # Author: DerekGn
 #
-
+import DomoticzEx as Domoticz
 import OpenThings
-import Domoticz
 import Common
 
 MFRID_ENERGENIE = 0x04
@@ -61,23 +60,19 @@ CRYPT_PID = 242
 CRYPT_PIP = 0x0100
 
 
-def createDevice(deviceId, productId, unitIndex):
+def createDevice(deviceId, productId):
     if(productId == PRODUCTID_MIHO032):
         unitIndex += 1
-        Domoticz.Log("Creating Motion Sensor Id: " +
-                     deviceId + " Unit Id: " + str(unitIndex))
-        Domoticz.Device(Name="Motion Sensor", DeviceID=deviceId, Unit=unitIndex,
+        Domoticz.Log("Creating Motion Sensor Id: " + deviceId)
+        Domoticz.Device(Name="Motion Sensor", DeviceID=deviceId, Unit=1,
                         TypeName="Switch", Type=244, Subtype=62, Switchtype=8,
                         Description="MIHO032 Infra red Motion Sensor", Used=1).Create()
     elif(productId == PRODUCTID_MIHO033):
         unitIndex += 1
-        Domoticz.Log("Creating Door Sensor Id: " +
-                     deviceId + " Unit Id: " + str(unitIndex))
-        Domoticz.Device(Name="Door Sensor", DeviceID=deviceId, Unit=unitIndex,
+        Domoticz.Log("Creating Door Sensor Id: " + deviceId)
+        Domoticz.Device(Name="Door Sensor", DeviceID=deviceId, Unit=1,
                         TypeName="Switch", Type=244, Subtype=73, Switchtype=11,
                         Description="MIHO033 Door Sensor", Used=1).Create()
-    return unitIndex
-
 
 def updateDevice(device, productId, message):
     if(productId == PRODUCTID_MIHO032):

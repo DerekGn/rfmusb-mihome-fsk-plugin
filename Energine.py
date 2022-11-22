@@ -72,20 +72,23 @@ def createDevice(deviceId, productId):
                         Description="MIHO033 Door Sensor", Used=1).Create()
 
 def updateDevice(deviceId, devices, productId, message):
-    if(productId == PRODUCTID_MIHO032):
-        motionRecord = Common.findRecord(
-            message, OpenThings.PARAM_MOTION_DETECTOR)
-        # TODO map 0 value
-        Domoticz.Debug("Updating Motion Sensor Id: " +
-                    str(deviceId) + str(motionRecord["value"]))
-        
-        devices[deviceId].Unit[1].nValue = int(motionRecord["value"])
-        devices[deviceId].Unit[1].sValue = str(motionRecord["value"])
-        devices[deviceId].Unit[1].Update(Log=True)
-    elif(productId == PRODUCTID_MIHO033):
-        Domoticz.Debug("Updating Door Sensor Id: " + str(deviceId))
-        doorRecord = Common.findRecord(message, OpenThings.PARAM_DOOR_SENSOR)
+    if(Common.deviceAndUnitExists(devices, deviceId, 1)):
+        if(productId == PRODUCTID_MIHO032):
+            motionRecord = Common.findRecord(
+                message, OpenThings.PARAM_MOTION_DETECTOR)
+            # TODO map 0 value
+            Domoticz.Debug("Updating Motion Sensor Id: " +
+                        str(deviceId) + str(motionRecord["value"]))
+            
+            devices[deviceId].Unit[1].nValue = int(motionRecord["value"])
+            devices[deviceId].Unit[1].sValue = str(motionRecord["value"])
+            devices[deviceId].Unit[1].Update(Log=True)
+        elif(productId == PRODUCTID_MIHO033):
+            Domoticz.Debug("Updating Door Sensor Id: " + str(deviceId))
+            doorRecord = Common.findRecord(message, OpenThings.PARAM_DOOR_SENSOR)
 
-        devices[deviceId].Unit[1].nValue = int(doorRecord["value"])
-        devices[deviceId].Unit[1].sValue = str(doorRecord["value"])
-        devices[deviceId].Unit[1].Update(Log=True)
+            devices[deviceId].Unit[1].nValue = int(doorRecord["value"])
+            devices[deviceId].Unit[1].sValue = str(doorRecord["value"])
+            devices[deviceId].Unit[1].Update(Log=True)
+    else:
+        Domoticz.Error("Unable to resolve Device Id: " + deviceId)

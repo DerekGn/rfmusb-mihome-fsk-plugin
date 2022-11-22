@@ -297,12 +297,6 @@ def onHeartbeat():
     global _plugin
     _plugin.onHeartbeat()
 
-
-def onDeviceRemoved(Unit):
-    Domoticz.Debug("Device Removed: " + str(Unit))
-    # Generic helper functions
-
-
 def DumpConfigToLog():
     for x in Parameters:
         if Parameters[x] != "":

@@ -143,10 +143,10 @@ def updateTemperatureHumiditySensor(deviceId, devices, message):
                        + "] Humidity: [" + str(humidity)
                        + "] Battery Level: [" + str(batteryLevel) + "]")
     
-    devices[deviceId].Unit[1].nValue = temperature
-    devices[deviceId].Unit[1].sValue = str(temperature) + ";" + str(humidity)
-    devices[deviceId].Unit[1].BatteryLevel = batteryLevel
-    devices[deviceId].Unit[1].Update(Log=True)
+    devices[deviceId].Units[1].nValue = temperature
+    devices[deviceId].Units[1].sValue = str(temperature) + ";" + str(humidity)
+    devices[deviceId].Units[1].BatteryLevel = batteryLevel
+    devices[deviceId].Units[1].Update(Log=True)
 
 def updateAqsSensor(deviceId, devices, message):
     Domoticz.Log("Updating AQS Sensor Id: " + str(deviceId))
@@ -166,14 +166,14 @@ def updateAqsSensor(deviceId, devices, message):
                        + "] Humidity: [" + str(humidity)
                        + "] Battery Level: [" + str(batteryLevel) + "]")
 
-    devices[deviceId].Unit[1].nValue = vocIndex
-    devices[deviceId].Unit[1].sValue = str(vocIndex)
-    devices[deviceId].Unit[1].BatteryLevel = batteryLevel
-    devices[deviceId].Unit[1].Update(Log=True)
+    devices[deviceId].Units[1].nValue = vocIndex
+    devices[deviceId].Units[1].sValue = str(vocIndex)
+    devices[deviceId].Units[1].BatteryLevel = batteryLevel
+    devices[deviceId].Units[1].Update(Log=True)
 
-    devices[deviceId].Unit[2].nValue = temperature
-    devices[deviceId].Unit[2].sValue = str(temperature) + ";" + str(humidity)
-    devices[deviceId].Unit[2].Update(Log=True)
+    devices[deviceId].Units[2].nValue = temperature
+    devices[deviceId].Units[2].sValue = str(temperature) + ";" + str(humidity)
+    devices[deviceId].Units[2].Update(Log=True)
     
 def updateEnergyMeterSensor(deviceId, devices, message):
     Domoticz.Log("Updating Energy Meter Sensor Id: " + str(deviceId))
@@ -188,13 +188,13 @@ def updateEnergyMeterSensor(deviceId, devices, message):
                        + "] frequency: [" + str(frequency)
                        + "]")
 
-    devices[deviceId].Unit[1].nValue = voltage
-    devices[deviceId].Unit[1].sValue = str(voltage)
-    devices[deviceId].Unit[1].Update(Log=True)
+    devices[deviceId].Units[1].nValue = voltage
+    devices[deviceId].Units[1].sValue = str(voltage)
+    devices[deviceId].Units[1].Update(Log=True)
 
-    devices[deviceId].Unit[2].nValue = frequency
-    devices[deviceId].Unit[2].sValue = str(frequency)
-    devices[deviceId].Unit[2].Update(Log=True)
+    devices[deviceId].Units[2].nValue = frequency
+    devices[deviceId].Units[2].sValue = str(frequency)
+    devices[deviceId].Units[2].Update(Log=True)
 
     iRecord_L = Common.findRecord(message, OpenThings.PARAM_CURRENT_L)
     phaseRecord_L = Common.findRecord(message, OpenThings.PARAM_PHASE_ANGLE_L)
@@ -221,28 +221,28 @@ def updateEnergyMeterSensor(deviceId, devices, message):
 def updateLineMeasurements(devices, currentRecord, phaseRecord, activePowerRecord,
                            powerFactorRecord, reactivePowerRecord, apparentPowerRecord, unitIndex):
     # Current
-    devices[deviceId].Unit[unitIndex].nValue=round(currentRecord["value"],2)
-    devices[deviceId].Unit[unitIndex].Update()
+    devices[deviceId].Units[unitIndex].nValue=round(currentRecord["value"],2)
+    devices[deviceId].Units[unitIndex].Update()
     unitIndex += 1
     # Phase
-    devices[deviceId].Unit[unitIndex].nValue=round(phaseRecord["value"],2)
-    devices[deviceId].Unit[unitIndex].Update()
+    devices[deviceId].Units[unitIndex].nValue=round(phaseRecord["value"],2)
+    devices[deviceId].Units[unitIndex].Update()
     unitIndex += 1
     # Mean Active Power
-    devices[deviceId].Unit[unitIndex].nValue=round(activePowerRecord["value"],2)
-    devices[deviceId].Unit[unitIndex].Update()
+    devices[deviceId].Units[unitIndex].nValue=round(activePowerRecord["value"],2)
+    devices[deviceId].Units[unitIndex].Update()
     unitIndex += 1
     # Mean Reactive Power
-    devices[deviceId].Unit[unitIndex].nValue=round(reactivePowerRecord["value"],2)
-    devices[deviceId].Unit[unitIndex].Update()
+    devices[deviceId].Units[unitIndex].nValue=round(reactivePowerRecord["value"],2)
+    devices[deviceId].Units[unitIndex].Update()
     unitIndex += 1
     # Power Factor
-    devices[deviceId].Unit[unitIndex].nValue=round(powerFactorRecord["value"],2)
-    devices[deviceId].Unit[unitIndex].Update()
+    devices[deviceId].Units[unitIndex].nValue=round(powerFactorRecord["value"],2)
+    devices[deviceId].Units[unitIndex].Update()
     unitIndex += 1
     # Apparent Power
-    devices[deviceId].Unit[unitIndex].nValue=round(apparentPowerRecord["value"],2)
-    devices[deviceId].Unit[unitIndex].Update()
+    devices[deviceId].Units[unitIndex].nValue=round(apparentPowerRecord["value"],2)
+    devices[deviceId].Units[unitIndex].Update()
     unitIndex += 1
 
     return unitIndex
@@ -251,38 +251,38 @@ def updateEnergyMeasurements(device, message, unitIndex):
     # Absolute Active Energy
     record = Common.findRecord(
         message, OpenThings.PARAM_ABS_ACTIVE_ENERGY)
-    devices[deviceId].Unit[unitIndex].nValue=round(record["value"],2)
-    devices[deviceId].Unit[unitIndex].Update()
+    devices[deviceId].Units[unitIndex].nValue=round(record["value"],2)
+    devices[deviceId].Units[unitIndex].Update()
     unitIndex += 1
     # Absolute Reactive Energy
     record = Common.findRecord(
         message, OpenThings.PARAM_ABS_REACTIVE_ENERGY)
-    devices[deviceId].Unit[unitIndex].nValue=round(record["value"],2)
-    devices[deviceId].Unit[unitIndex].Update()
+    devices[deviceId].Units[unitIndex].nValue=round(record["value"],2)
+    devices[deviceId].Units[unitIndex].Update()
     unitIndex += 1
     # Forward Active Energy
     record = Common.findRecord(
         message, OpenThings.PARAM_FWD_ACTIVE_ENERGY)
-    devices[deviceId].Unit[unitIndex].nValue=round(record["value"],2)
-    devices[deviceId].Unit[unitIndex].Update()
+    devices[deviceId].Units[unitIndex].nValue=round(record["value"],2)
+    devices[deviceId].Units[unitIndex].Update()
     unitIndex += 1
     # Forward Reactive Energy
     record = Common.findRecord(
         message, OpenThings.PARAM_FWD_REACTIVE_ENERGY)
-    devices[deviceId].Unit[unitIndex].nValue=round(record["value"],2)
-    devices[deviceId].Unit[unitIndex].Update()
+    devices[deviceId].Units[unitIndex].nValue=round(record["value"],2)
+    devices[deviceId].Units[unitIndex].Update()
     unitIndex += 1
     # Reverse Active Energy
     record = Common.findRecord(
         message, OpenThings.PARAM_REV_ACTIVE_ENERGY)
-    devices[deviceId].Unit[unitIndex].nValue=round(record["value"],2)
-    devices[deviceId].Unit[unitIndex].Update()
+    devices[deviceId].Units[unitIndex].nValue=round(record["value"],2)
+    devices[deviceId].Units[unitIndex].Update()
     unitIndex += 1
     # Reverse Reactive Energy
     record = Common.findRecord(
         message, OpenThings.PARAM_REV_REACTIVE_ENERGY)
-    devices[deviceId].Unit[unitIndex].nValue=round(record["value"],2)
-    devices[deviceId].Unit[unitIndex].Update()
+    devices[deviceId].Units[unitIndex].nValue=round(record["value"],2)
+    devices[deviceId].Units[unitIndex].Update()
     unitIndex += 1
 
 def findDeviceByType(devices, deviceType):

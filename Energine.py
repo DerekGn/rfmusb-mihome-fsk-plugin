@@ -59,7 +59,6 @@ PRODUCTID_MIHO033 = 0x0D  # FSK: Open sensor
 CRYPT_PID = 242
 CRYPT_PIP = 0x0100
 
-
 def createDevice(deviceId, productId):
     if(productId == PRODUCTID_MIHO032):
         Domoticz.Log("Creating Motion Sensor Id: " + deviceId)
@@ -72,8 +71,7 @@ def createDevice(deviceId, productId):
                         TypeName="Switch", Type=244, Subtype=73, Switchtype=11,
                         Description="MIHO033 Door Sensor", Used=1).Create()
 
-def updateDevice(deviceId, productId, message):
-    device = Common.findDevice(deviceId)
+def updateDevice(device, productId, message):
     if(device is not None):
         if(productId == PRODUCTID_MIHO032):
             motionRecord = Common.findRecord(
@@ -95,5 +93,3 @@ def updateDevice(deviceId, productId, message):
 
             device.Update(nValue=int(
                 doorRecord["value"]), sValue=str(doorRecord["value"]))
-    else:
-        Domoticz.Error("Unable to find Device for Id: " + deviceId)

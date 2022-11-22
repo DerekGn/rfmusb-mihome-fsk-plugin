@@ -64,7 +64,7 @@ def createDevice(deviceId, productId):
     if(productId == PRODUCTID_MIHO032):
         Domoticz.Log("Creating Motion Sensor Id: " + deviceId)
         Domoticz.Unit(Name="Motion Sensor", DeviceID=deviceId, Unit=1,
-                        TypeName="Switch", Type=244, Subtype=62, Switchtype=8,
+                        TypeName="Switch", Type=244, Subtype=73, Switchtype=8,
                         Description="MIHO032 Infra red Motion Sensor", Used=1).Create()
     elif(productId == PRODUCTID_MIHO033):
         Domoticz.Log("Creating Door Sensor Id: " + deviceId)

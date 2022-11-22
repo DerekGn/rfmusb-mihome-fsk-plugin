@@ -5,7 +5,7 @@
 
 import DomoticzEx as Domoticz
 
-def findDevice(self, deviceId):
+def findDevice(deviceId):
         for x in Devices:
             if(Devices[x].DeviceID == deviceId):
                 return Devices[x]

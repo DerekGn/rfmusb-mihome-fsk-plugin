@@ -63,12 +63,12 @@ CRYPT_PIP = 0x0100
 def createDevice(deviceId, productId):
     if(productId == PRODUCTID_MIHO032):
         Domoticz.Log("Creating Motion Sensor Id: " + deviceId)
-        Domoticz.Device(Name="Motion Sensor", DeviceID=deviceId, Unit=1,
+        Domoticz.Unit(Name="Motion Sensor", DeviceID=deviceId, Unit=1,
                         TypeName="Switch", Type=244, Subtype=62, Switchtype=8,
                         Description="MIHO032 Infra red Motion Sensor", Used=1).Create()
     elif(productId == PRODUCTID_MIHO033):
         Domoticz.Log("Creating Door Sensor Id: " + deviceId)
-        Domoticz.Device(Name="Door Sensor", DeviceID=deviceId, Unit=1,
+        Domoticz.Unit(Name="Door Sensor", DeviceID=deviceId, Unit=1,
                         TypeName="Switch", Type=244, Subtype=73, Switchtype=11,
                         Description="MIHO033 Door Sensor", Used=1).Create()
 

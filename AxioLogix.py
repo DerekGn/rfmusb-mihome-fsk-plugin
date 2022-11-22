@@ -143,9 +143,10 @@ def updateTemperatureHumiditySensor(deviceId, message):
                        + "] Humidity: [" + str(humidity)
                        + "] Battery Level: [" + str(batteryLevel) + "]")
     
-    Devices[deviceId].nValue = temperature
-    Devices[deviceId].sValue = str(temperature) + ";" + str(humidity)
-    Devices[deviceId].BatteryLevel = batteryLevel
+    Devices[deviceId].Unit[1].nValue = temperature
+    Devices[deviceId].Unit[1].sValue = str(temperature) + ";" + str(humidity)
+    Devices[deviceId].Unit[1].BatteryLevel = batteryLevel
+    Devices[deviceId].Unit[1].Update(Log=True)
 
 def updateAqsSensor(deviceId, message):
     Domoticz.Log("Updating AQS Sensor Id: " + deviceId)

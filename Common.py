@@ -3,6 +3,13 @@
 # Author: DerekGn
 #
 
+import DomoticzEx as Domoticz
+
+def findDevice(self, deviceId):
+        for x in Devices:
+            if(Devices[x].DeviceID == deviceId):
+                return Devices[x]
+
 def findRecord(message, idToFind):
     for record in message["recs"]:
         parameterId = record["paramid"]

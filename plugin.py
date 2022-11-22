@@ -80,7 +80,6 @@ import AxioLogix
 import Energine
 import Common
 
-
 class BasePlugin:
 
     CMD_GET_FIRMWARE_VERSION = "g-fv"
@@ -241,18 +240,11 @@ class BasePlugin:
             Domoticz.Error("Unknown Product Id: " + str(productId))
 
     def updateDevice(self, deviceId, manufacturerId, productId, message):
-        device = self.findDevice(deviceId)
-        if(device is not None):
-            if(manufacturerId == Energine.MFRID_ENERGENIE):
-                Energine.updateDevice(device, productId, message)
-            elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
-                AxioLogix.updateDevice(device, productId, message)
-
-    def findDevice(self, deviceId):
-        for x in Devices:
-            if(Devices[x].DeviceID == deviceId):
-                return Devices[x]
-
+        if(manufacturerId == Energine.MFRID_ENERGENIE):
+            Energine.updateDevice(deviceId, productId, message)
+        elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
+            AxioLogix.updateDevice(deviceId, productId, message)
+        
     def deviceExists(self, deviceId):
         for x in Devices:
             if(Devices[x].DeviceID == deviceId):

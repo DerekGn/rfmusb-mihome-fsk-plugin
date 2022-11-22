@@ -62,29 +62,38 @@ CRYPT_PIP = 0x0100
 
 def createDevice(deviceId, productId):
     if(productId == PRODUCTID_MIHO032):
-        unitIndex += 1
         Domoticz.Log("Creating Motion Sensor Id: " + deviceId)
         Domoticz.Device(Name="Motion Sensor", DeviceID=deviceId, Unit=1,
                         TypeName="Switch", Type=244, Subtype=62, Switchtype=8,
                         Description="MIHO032 Infra red Motion Sensor", Used=1).Create()
     elif(productId == PRODUCTID_MIHO033):
-        unitIndex += 1
         Domoticz.Log("Creating Door Sensor Id: " + deviceId)
         Domoticz.Device(Name="Door Sensor", DeviceID=deviceId, Unit=1,
                         TypeName="Switch", Type=244, Subtype=73, Switchtype=11,
                         Description="MIHO033 Door Sensor", Used=1).Create()
 
-def updateDevice(device, productId, message):
-    if(productId == PRODUCTID_MIHO032):
-        motionRecord = Common.findRecord(
-            message, OpenThings.PARAM_MOTION_DETECTOR)
-        # TODO map 0 value
-        Domoticz.Debug("Updating Motion Sensor Id: " +
-                       str(device.ID) + str(motionRecord["value"]))
-        device.Update(nValue=int(motionRecord["value"]), sValue=str(
-            motionRecord["value"]))
-    elif(productId == PRODUCTID_MIHO033):
-        Domoticz.Debug("Updating Door Sensor Id: " + str(device.ID))
-        doorRecord = Common.findRecord(message, OpenThings.PARAM_DOOR_SENSOR)
-        device.Update(nValue=int(
-            doorRecord["value"]), sValue=str(doorRecord["value"]))
+def updateDevice(deviceId, productId, message):
+    device = Common.findDevice(deviceId)
+    if(device is not None):
+        if(productId == PRODUCTID_MIHO032):
+            motionRecord = Common.findRecord(
+                message, OpenThings.PARAM_MOTION_DETECTOR)
+            # TODO map 0 value
+            Domoticz.Debug("Updating Motion Sensor Id: " +
+                        str(device.ID) + str(motionRecord["value"]))
+            
+            device[1].nValue = int(motionRecord["value"])
+            device[1].sValue = str(motionRecord["value"])
+            device[1].Update(Log=True)
+        elif(productId == PRODUCTID_MIHO033):
+            Domoticz.Debug("Updating Door Sensor Id: " + str(device.ID))
+            doorRecord = Common.findRecord(message, OpenThings.PARAM_DOOR_SENSOR)
+
+            device[1].nValue = int(doorRecord["value"])
+            device[1].sValue = str(doorRecord["value"])
+            device[1].Update(Log=True)
+
+            device.Update(nValue=int(
+                doorRecord["value"]), sValue=str(doorRecord["value"]))
+    else:
+        Domoticz.Error("Unable to find Device for Id: " + deviceId)

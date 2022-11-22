@@ -243,9 +243,9 @@ class BasePlugin:
         device = self.findDevice(deviceId)
         if(device is not None):
             if(manufacturerId == Energine.MFRID_ENERGENIE):
-                Energine.updateDevice(device, productId, message)
+                Energine.updateDevice(deviceId, device, productId, message)
             elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
-                AxioLogix.updateDevice(device, productId, message)
+                AxioLogix.updateDevice(deviceId, device, productId, message)
         else:
             Domoticz.Error("Unable to find Device for Id: " + deviceId)
 

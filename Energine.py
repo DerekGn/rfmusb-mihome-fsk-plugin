@@ -71,22 +71,21 @@ def createDevice(deviceId, productId):
                         TypeName="Switch", Type=244, Subtype=73, Switchtype=11,
                         Description="MIHO033 Door Sensor", Used=1).Create()
 
-def updateDevice(deviceId, device, productId, message):
-    if(device is not None):
-        if(productId == PRODUCTID_MIHO032):
-            motionRecord = Common.findRecord(
-                message, OpenThings.PARAM_MOTION_DETECTOR)
-            # TODO map 0 value
-            Domoticz.Debug("Updating Motion Sensor Id: " +
-                        str(deviceId) + str(motionRecord["value"]))
-            
-            device.Unit[1].nValue = int(motionRecord["value"])
-            device.Unit[1].sValue = str(motionRecord["value"])
-            device.Unit[1].Update(Log=True)
-        elif(productId == PRODUCTID_MIHO033):
-            Domoticz.Debug("Updating Door Sensor Id: " + str(deviceId))
-            doorRecord = Common.findRecord(message, OpenThings.PARAM_DOOR_SENSOR)
+def updateDevice(deviceId, devices, productId, message):
+    if(productId == PRODUCTID_MIHO032):
+        motionRecord = Common.findRecord(
+            message, OpenThings.PARAM_MOTION_DETECTOR)
+        # TODO map 0 value
+        Domoticz.Debug("Updating Motion Sensor Id: " +
+                    str(deviceId) + str(motionRecord["value"]))
+        
+        devices[deviceId].Unit[1].nValue = int(motionRecord["value"])
+        devices[deviceId].Unit[1].sValue = str(motionRecord["value"])
+        devices[deviceId].Unit[1].Update(Log=True)
+    elif(productId == PRODUCTID_MIHO033):
+        Domoticz.Debug("Updating Door Sensor Id: " + str(deviceId))
+        doorRecord = Common.findRecord(message, OpenThings.PARAM_DOOR_SENSOR)
 
-            device.Unit[1].nValue = int(doorRecord["value"])
-            device.Unit[1].sValue = str(doorRecord["value"])
-            device.Unit[1].Update(Log=True)
+        devices[deviceId].Unit[1].nValue = int(doorRecord["value"])
+        devices[deviceId].Unit[1].sValue = str(doorRecord["value"])
+        devices[deviceId].Unit[1].Update(Log=True)

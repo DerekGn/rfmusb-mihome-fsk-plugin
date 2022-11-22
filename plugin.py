@@ -240,19 +240,10 @@ class BasePlugin:
             Domoticz.Error("Unknown Product Id: " + str(productId))
 
     def updateDevice(self, deviceId, manufacturerId, productId, message):
-        device = self.findDevice(deviceId)
-        if(device is not None):
-            if(manufacturerId == Energine.MFRID_ENERGENIE):
-                Energine.updateDevice(deviceId, device, productId, message)
-            elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
-                AxioLogix.updateDevice(deviceId, device, productId, message)
-        else:
-            Domoticz.Error("Unable to find Device for Id: " + deviceId)
-
-    def findDevice(self, deviceId):
-        for x in Devices:
-            if(Devices[x].DeviceID == deviceId):
-                return Devices[x]
+        if(manufacturerId == Energine.MFRID_ENERGENIE):
+            Energine.updateDevice(deviceId, Devices, productId, message)
+        elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
+            AxioLogix.updateDevice(deviceId, Devices, productId, message)
     
     def deviceExists(self, deviceId):
         for x in Devices:

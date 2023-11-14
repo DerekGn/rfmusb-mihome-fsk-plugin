@@ -71,7 +71,7 @@ def createDevice(deviceId, productId):
                         TypeName="Switch", Type=244, Subtype=73, Switchtype=11,
                         Description="MIHO033 Door Sensor", Used=1).Create()
 
-def updateDevice(deviceId, devices, productId, message):
+def updateDevice(deviceId, devices, productId, message, rssi):
     if(Common.deviceAndUnitExists(devices, deviceId, 1)):
         if(productId == PRODUCTID_MIHO032):
             motionRecord = Common.findRecord(
@@ -82,6 +82,7 @@ def updateDevice(deviceId, devices, productId, message):
             
             devices[deviceId].Units[1].nValue = int(motionRecord["value"])
             devices[deviceId].Units[1].sValue = str(motionRecord["value"])
+            devices[deviceId].Units[1].SignalLevel = rssi
             devices[deviceId].Units[1].Update(Log=True)
         elif(productId == PRODUCTID_MIHO033):
             Domoticz.Debug("Updating Door Sensor Id: " + str(deviceId))
@@ -89,6 +90,7 @@ def updateDevice(deviceId, devices, productId, message):
 
             devices[deviceId].Units[1].nValue = int(doorRecord["value"])
             devices[deviceId].Units[1].sValue = str(doorRecord["value"])
+            devices[deviceId].Units[1].SignalLevel = rssi
             devices[deviceId].Units[1].Update(Log=True)
     else:
         Domoticz.Error("Unable to resolve Device Id: " + deviceId)

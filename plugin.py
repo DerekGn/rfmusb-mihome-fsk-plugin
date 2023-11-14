@@ -25,6 +25,7 @@
     </description>
     <params>
         <param field="SerialPort" label="Serial Port" width="150px" required="true" default="/dev/serial1"/>
+        <param field="Mode3" label="RSSI Threshold" width="100px" required="true" default="-114"/>
         <param field="Mode4" label="Tx Power Level" width="100px" required="true" default="0">
             <options>
                 <option label="-2 dbm" value="-2"/>
@@ -52,13 +53,6 @@
                 <option label="20 dbm" value="20"/>
             </options>
         </param>
-        <param field="Mode5" label="Tx Count" width="100px" default="5">
-            <options>
-                <option label="Five" value="5"/>
-                <option label="Eight" value="8"/>
-                <option label="Thirteen" value="13"/>
-            </options>
-        </param>
         <param field="Mode6" label="Debug" width="150px">
             <options>
                 <option label="None" value="0"  default="true" />
@@ -83,11 +77,16 @@ import Common
 class BasePlugin:
 
     CMD_GET_FIRMWARE_VERSION = "g-fv"
+    CMD_SET_RSSI_THRESHOLD = "s-rt"
+    CMD_SET_OUTPUT_POWER = "s-op"
+    CMD_GET_LAST_RSSI = "g-lrssi"
     CMD_SET_STANDBY = "e-om 1"
     CMD_GET_FIFO = "g-fifo"
     CMD_SET_RX = "s-om 4"
-    CMD_RESULT_OK = "OK"
-
+    
+    RESPONSE_IRQ = "DIO PIN IRQ"
+    RESPONSE_OK = "OK"
+    
     InitCommands = [
         "e-r",
         "s-mt 0",
@@ -101,12 +100,14 @@ class BasePlugin:
         "s-sync 2DD4",
         "s-pf 0",
         "s-dfe 1",
-        "s-cc 0",
+        "s-crc 0",
         "s-caco 0",
         "s-af 0",
         "s-pl 66",
         "s-dio 0 1",
-        "s-di 1",
+        "s-dio 3 1",
+        "s-dim 0x9",
+        "s-rt",
         "s-op"
     ]
 
@@ -114,6 +115,7 @@ class BasePlugin:
     CommandIndex = 0
     SerialConn = None
     IsInitalised = False
+    LastRssi = 0
 
     def __init__(self):
         return
@@ -155,18 +157,25 @@ class BasePlugin:
 
         if(self.IsInitalised == False):
             if(self.CommandIndex < len(self.InitCommands)):
-                if(self.InitCommands[self.CommandIndex].startswith("s-op")):
-                    self.sendCommand("s-op " + str(Parameters["Mode4"]))
+                if(self.InitCommands[self.CommandIndex].startswith(self.CMD_SET_RSSI_THRESHOLD)):
+                    self.sendCommand(self.CMD_SET_RSSI_THRESHOLD + " " + str(Parameters["Mode3"]))
+                elif(self.InitCommands[self.CommandIndex].startswith(self.CMD_SET_OUTPUT_POWER)):
+                    self.sendCommand(self.CMD_SET_OUTPUT_POWER + " " + str(Parameters["Mode4"]))
                 else:
                     self.sendCommand(self.InitCommands[self.CommandIndex])
 
                 self.CommandIndex = self.CommandIndex + 1
+                Domoticz.Debug("CommandIndex: " + str(self.CommandIndex))
             else:
+                Domoticz.Debug("Initalised CommandIndex: " + str(self.CommandIndex) + "Command Count:" + str(len(self.InitCommands)))
                 self.LastCommand = ""
                 self.IsInitalised = True
                 self.sendCommand(self.CMD_SET_RX)
         else:
-            if("DIO PIN IRQ" in strData):
+            if(self.RESPONSE_IRQ in strData):
+                self.sendCommand(self.CMD_GET_LAST_RSSI)
+            elif(self.LastCommand == self.CMD_GET_LAST_RSSI):
+                self.LastRssi = int(strData, 16)                
                 self.sendCommand(self.CMD_GET_FIFO)
             elif(self.LastCommand == self.CMD_GET_FIFO):
                 # Decode the fifo data
@@ -241,9 +250,9 @@ class BasePlugin:
 
     def updateDevice(self, deviceId, manufacturerId, productId, message):
         if(manufacturerId == Energine.MFRID_ENERGENIE):
-            Energine.updateDevice(deviceId, Devices, productId, message)
+            Energine.updateDevice(deviceId, Devices, productId, message, self.LastRssi)
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
-            AxioLogix.updateDevice(deviceId, Devices, productId, message)
+            AxioLogix.updateDevice(deviceId, Devices, productId, message, self.LastRssi)
     
     def deviceExists(self, deviceId):
         for x in Devices:

@@ -84,7 +84,7 @@ class BasePlugin:
     CMD_GET_FIFO = "g-fifo"
     CMD_SET_RX = "s-om 4"
     
-    RESPONSE_IRQ_RX_RSSI = "DIO PIN IRQ [0x09]"
+    RESPONSE_IRQ_RSSI = "DIO PIN IRQ [0x08]"
     RESPONSE_IRQ_RX = "DIO PIN IRQ [0x01]"
     RESPONSE_OK = "OK"
     
@@ -154,10 +154,10 @@ class BasePlugin:
         strData = Data.decode("ascii")
         strData = strData.replace("\n", "")
 
-        Domoticz.Debug(
-            "Command Executed: ["+self.LastCommand+"] Response: ["+strData+"] ")
-
         if(self.IsInitalised == False):
+            
+            Domoticz.Debug("Command Executed: ["+self.LastCommand+"] Response: ["+strData+"] ")
+            
             if(self.CommandIndex < len(self.InitCommands)):
                 if(self.InitCommands[self.CommandIndex].startswith(self.CMD_SET_RSSI_THRESHOLD)):
                     self.sendCommand(self.CMD_SET_RSSI_THRESHOLD + " " + str(Parameters["Mode3"]))
@@ -167,19 +167,23 @@ class BasePlugin:
                     self.sendCommand(self.InitCommands[self.CommandIndex])
 
                 self.CommandIndex = self.CommandIndex + 1
-                Domoticz.Debug("CommandIndex: " + str(self.CommandIndex))
             else:
-                Domoticz.Debug("Initalised CommandIndex: " + str(self.CommandIndex) + "Command Count:" + str(len(self.InitCommands)))
+                Domoticz.Debug("Initalised Rfm")
                 self.LastCommand = ""
                 self.IsInitalised = True
                 self.sendCommand(self.CMD_SET_RX)
         else:
-            if((self.RESPONSE_IRQ_RX in strData) or (self.RESPONSE_IRQ_RX_RSSI in strData)):
+            if(self.RESPONSE_IRQ_RSSI in strData):
+                Domoticz.Debug("Serial Data: ["+strData+"]")
                 self.sendCommand(self.CMD_GET_LAST_RSSI)
-            elif(self.LastCommand == self.CMD_GET_LAST_RSSI):
-                self.LastRssi = int(strData, 16)                
+            elif(self.RESPONSE_IRQ_RX in strData):
+                Domoticz.Debug("Serial Data: ["+strData+"]")
                 self.sendCommand(self.CMD_GET_FIFO)
+            elif(self.LastCommand == self.CMD_GET_LAST_RSSI):
+                Domoticz.Debug("Command Executed: ["+self.LastCommand+"] Response: ["+strData+"] ")
+                self.LastRssi = int(strData, 16)
             elif(self.LastCommand == self.CMD_GET_FIFO):
+                Domoticz.Debug("Command Executed: ["+self.LastCommand+"] Response: ["+strData+"] ")
                 # Decode the fifo data
                 self.LastCommand = ""
                 self.decodeProcessFifoData(strData)

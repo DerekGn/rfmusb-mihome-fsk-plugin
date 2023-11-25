@@ -84,7 +84,8 @@ class BasePlugin:
     CMD_GET_FIFO = "g-fifo"
     CMD_SET_RX = "s-om 4"
     
-    RESPONSE_IRQ = "DIO PIN IRQ"
+    RESPONSE_IRQ_RX_RSSI = "DIO PIN IRQ [0x09]"
+    RESPONSE_IRQ_RX = "DIO PIN IRQ [0x01]"
     RESPONSE_OK = "OK"
     
     InitCommands = [
@@ -116,6 +117,7 @@ class BasePlugin:
     SerialConn = None
     IsInitalised = False
     LastRssi = 0
+    LastIrq = 0
 
     def __init__(self):
         return
@@ -153,7 +155,7 @@ class BasePlugin:
         strData = strData.replace("\n", "")
 
         Domoticz.Debug(
-            "Command Executed: ["+self.LastCommand+"] Respose: ["+strData+"] ")
+            "Command Executed: ["+self.LastCommand+"] Response: ["+strData+"] ")
 
         if(self.IsInitalised == False):
             if(self.CommandIndex < len(self.InitCommands)):
@@ -172,7 +174,7 @@ class BasePlugin:
                 self.IsInitalised = True
                 self.sendCommand(self.CMD_SET_RX)
         else:
-            if(self.RESPONSE_IRQ in strData):
+            if((self.RESPONSE_IRQ_RX in strData) or (self.RESPONSE_IRQ_RX_RSSI in strData)):
                 self.sendCommand(self.CMD_GET_LAST_RSSI)
             elif(self.LastCommand == self.CMD_GET_LAST_RSSI):
                 self.LastRssi = int(strData, 16)                

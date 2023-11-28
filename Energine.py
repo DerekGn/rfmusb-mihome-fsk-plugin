@@ -64,12 +64,12 @@ def createDevice(deviceId, productId):
         Domoticz.Log("Creating Motion Sensor Id: " + deviceId)
         Domoticz.Unit(Name="Motion Sensor", DeviceID=deviceId, Unit=1,
                         TypeName="Switch", Type=244, Subtype=73, Switchtype=8,
-                        Description="MIHO032 Infra red Motion Sensor", Used=1).Create()
+                        Description="MIHO032 Infra red Motion Sensor").Create()
     elif(productId == PRODUCTID_MIHO033):
         Domoticz.Log("Creating Door Sensor Id: " + deviceId)
         Domoticz.Unit(Name="Door Sensor", DeviceID=deviceId, Unit=1,
                         TypeName="Switch", Type=244, Subtype=73, Switchtype=11,
-                        Description="MIHO033 Door Sensor", Used=1).Create()
+                        Description="MIHO033 Door Sensor").Create()
 
 def updateDevice(deviceId, devices, productId, message, rssi):
     if(Common.deviceAndUnitExists(devices, deviceId, 1)):

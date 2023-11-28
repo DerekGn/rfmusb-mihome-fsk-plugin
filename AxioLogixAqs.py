@@ -26,32 +26,32 @@ def createAqsSensor(deviceId):
                   Type=DeviceTypes.DEVICE_TYPE_GENERAL,
                   Subtype=DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
                   Options={'Custom': '1;IAQ'},
-                  Description="RfmAqs Sensor IAQ", Used=1).Create()
+                  Description="RfmAqs Sensor IAQ").Create()
     Domoticz.Unit(Name="Index", DeviceID=deviceId, Unit=INDEX_UNIT,
                   TypeName="Alert",
-                  Description="RfmAqs Sensor IAQ", Used=1).Create()
+                  Description="RfmAqs Sensor IAQ").Create()
     Domoticz.Unit(Name="TVOC", DeviceID=deviceId, Unit=TVOC_UNIT,
                   Type=DeviceTypes.DEVICE_TYPE_GENERAL,
                   Subtype=DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
                   Options={'Custom': '1;mg/m^3'},
-                  Description="RfmAqs Sensor TVOC", Used=1).Create()
+                  Description="RfmAqs Sensor TVOC").Create()
     Domoticz.Unit(Name="ETOH", DeviceID=deviceId, Unit=ETOH_UNIT,
                   Type=DeviceTypes.DEVICE_TYPE_GENERAL,
                   Subtype=DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
                   Options={'Custom': '1;ppm'},
-                  Description="RfmAqs Sensor ETOH", Used=1).Create()
+                  Description="RfmAqs Sensor ETOH").Create()
     Domoticz.Unit(Name="ECO2", DeviceID=deviceId, Unit=ECO2_UNIT,
                   Type=DeviceTypes.DEVICE_TYPE_GENERAL,
                   Subtype=DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
                   Options={'Custom': '1;ppm'},
-                  Description="RfmAqs Sensor ECO2", Used=1).Create()
+                  Description="RfmAqs Sensor ECO2").Create()
     Domoticz.Unit(Name="AQS Temp & Humidity", DeviceID=deviceId, Unit=TEMP_HUM_UNIT,
                   TypeName="Temp+Hum", Type=DeviceTypes.DEVICE_TYPE_TEMP_HUMIDITY,
-                  Description="RfmAqs Temp & Humidity", Used=1).Create()
+                  Description="RfmAqs Temp & Humidity").Create()
     Domoticz.Unit(Name="BatteryVoltage", DeviceID=deviceId, Unit=VBATT_UNIT,
                   Type=DeviceTypes.DEVICE_TYPE_GENERAL,
                   Subtype=DeviceTypes.DEVICE_SUB_TYPE_VOLTAGE,
-                  Description="RfmAqs Sensor Battery Voltage", Used=1).Create()
+                  Description="RfmAqs Sensor Battery Voltage").Create()
 
 def updateAqsSensor(deviceId, devices, message, rssi):
     Domoticz.Log("Updating AQS Sensor Id: " + str(deviceId))

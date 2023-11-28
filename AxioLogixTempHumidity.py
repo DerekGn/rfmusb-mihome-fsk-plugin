@@ -13,7 +13,7 @@ def createTempHumiditySensor(deviceId):
     Domoticz.Log("Creating Temp Humidity Sensor Id: " + str(deviceId))
     Domoticz.Unit(Name="Temp Humidity Sensor", DeviceID=deviceId, Unit=1,
                   TypeName="Temp+Hum", Type=DeviceTypes.DEVICE_TYPE_TEMP_HUMIDITY,
-                  Description="RfmTemp Sensor", Used=1).Create()
+                  Description="RfmTemp Sensor").Create()
 
 def updateTemperatureHumiditySensor(deviceId, devices, message, rssi):
     Domoticz.Log("Updating Temperature Humidity Sensor Id: " + str(deviceId))

@@ -15,12 +15,12 @@ def createEnergyMeterSensor(deviceId):
                     Type=DeviceTypes.DEVICE_TYPE_GENERAL,
                     Subtype=DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
                     Options={'Custom': '1;VAC'},
-                    Description="Rms Voltage", Used=1).Create()
+                    Description="Rms Voltage").Create()
     Domoticz.Unit(Name="Energy Meter Frequency", DeviceID=deviceId, Unit=2,
                     Type=DeviceTypes.DEVICE_TYPE_GENERAL,
                     Subtype=DeviceTypes.DEVICE_SUB_TYPE_CUSTOM,
                     Options={'Custom': '1;Hz'},
-                    Description="Line Voltage Frequency", Used=1).Create()
+                    Description="Line Voltage Frequency").Create()
 
     unitIndex = createLineMeasurements(deviceId, 3,  'L')
     unitIndex = createLineMeasurements(deviceId, unitIndex, 'N')

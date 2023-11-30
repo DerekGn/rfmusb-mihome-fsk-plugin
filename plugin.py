@@ -226,7 +226,7 @@ class BasePlugin:
             Domoticz.Error("Unable to decode payload: " + errorMessage)
 
     def handleMessage(self, message):
-        Domoticz.Log(str(message))
+        Domoticz.Debug(str(message))
         header = message["header"]
         sensorId = header["sensorid"]
         productId = header["productid"]
@@ -238,7 +238,7 @@ class BasePlugin:
 
         if(not self.deviceExists(deviceId)):
             join = Common.findRecord(message, OpenThings.PARAM_JOIN)
-            Domoticz.Log("Join: " + str(join))
+            Domoticz.Debug("Join: " + str(join))
             if(join is not None):
                 Domoticz.Log("Join Message From SensorId: "+str(sensorId))
                 self.addDevice(manufacturerId, deviceId, productId)

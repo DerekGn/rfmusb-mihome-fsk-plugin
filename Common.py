@@ -15,3 +15,9 @@ def findRecord(message, idToFind):
 
 def createDeviceId(productId, manufacturerId, sensorId):
     return str(productId) + ":" + str(manufacturerId) + ":" + str(sensorId)
+
+def roundRecordValue(record, rounding):
+    result = 0
+    if("value" in record):
+        result = round(record["value"], rounding)
+    return result

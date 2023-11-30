@@ -64,14 +64,14 @@ def updateAqsSensor(deviceId, devices, message, rssi):
     eco2Record = Common.findRecord(message, OpenThings.PARAM_ECO2)
     iaqRecord = Common.findRecord(message, OpenThings.PARAM_IAQ)
 
-    batteryVoltage = round(batteryVoltageRecord["value"], 2)
-    temperature = round(temperatureRecord["value"], 2)
-    humidity = round(humidityRecord["value"], 2)
+    batteryVoltage = Common.roundRecordValue(batteryVoltageRecord, 2)
+    temperature = Common.roundRecordValue(temperatureRecord, 2)
+    humidity = Common.roundRecordValue(humidityRecord, 2)
     batteryLevel = batteryLevelRecord["value"]
-    iaq = round(iaqRecord["value"], 2)
-    tvoc = round(tvocRecord["value"], 2)
-    etoh = round(etohRecord["value"], 2)
-    eco2 = round(eco2Record["value"], 2)
+    iaq = Common.roundRecordValue(iaqRecord, 2)
+    tvoc = Common.roundRecordValue(tvocRecord, 2)
+    etoh = Common.roundRecordValue(etohRecord, 2)
+    eco2 = Common.roundRecordValue(eco2Record, 2)
 
     iaqLevel = calculateIAQLevel(iaq)
     iaqtext = AIR_QUALITY_LEVEL_CONDITION[iaqLevel]
@@ -81,11 +81,11 @@ def updateAqsSensor(deviceId, devices, message, rssi):
                    "TVOC: [" + str(tvoc) + "] " +
                    "ETOH: [" + str(etoh) + "] " +
                    "ECO2: [" + str(eco2) + "] " +
-                   "IAQText: [" + iaqtext + "]" +
+                   "IAQText: [" + iaqtext + "] " +
                    "IAQLevel: [" + str(iaqLevel) + "] " +
                    "Humidity: [" + str(humidity) + "] " +
                    "Temperature: [" + str(temperature) + "] " +
-                   "Battery Level: [" + str(batteryLevel) + "]" +
+                   "Battery Level: [" + str(batteryLevel) + "] " +
                    "Battery Voltage: [" + str(batteryVoltage) + "]")
     
     devices[deviceId].Units[IAQ_UNIT].nValue = iaq

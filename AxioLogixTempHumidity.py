@@ -30,7 +30,6 @@ def updateTemperatureHumiditySensor(deviceId, devices, message, rssi):
                        + "] Humidity: [" + str(humidity)
                        + "] Battery Level: [" + str(batteryLevel) + "]")
     
-    devices[deviceId].Units[1].nValue = temperature
     devices[deviceId].Units[1].sValue = str(temperature) + ";" + str(humidity)
     devices[deviceId].Units[1].BatteryLevel = batteryLevel
     devices[deviceId].Units[1].SignalLevel = rssi

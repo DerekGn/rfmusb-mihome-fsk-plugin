@@ -243,7 +243,7 @@ class BasePlugin:
                 Domoticz.Log("Join Message From SensorId: "+str(sensorId))
                 self.addDevice(manufacturerId, deviceId, productId)
             else:
-                Domoticz.Log("Already joined SensorId: "+str(sensorId))
+                Domoticz.Log("SensorId: "+str(sensorId) + "not joined")
         else:
             Domoticz.Debug("Updating Device DeviceId: "+str(deviceId))
             self.updateDevice(deviceId, manufacturerId, productId, message)

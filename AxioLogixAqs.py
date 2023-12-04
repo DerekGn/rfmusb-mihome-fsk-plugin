@@ -67,7 +67,7 @@ def updateAqsSensor(deviceId, devices, message, rssi):
     batteryVoltage = Common.roundRecordValue(batteryVoltageRecord, 2)
     temperature = Common.roundRecordValue(temperatureRecord, 2)
     humidity = Common.roundRecordValue(humidityRecord, 2)
-    batteryLevel = batteryLevelRecord["value"]
+    batteryLevel = Common.roundRecordValue(batteryLevelRecord, 2)
     iaq = Common.roundRecordValue(iaqRecord, 2)
     tvoc = Common.roundRecordValue(tvocRecord, 2)
     etoh = Common.roundRecordValue(etohRecord, 2)

@@ -65,7 +65,7 @@ def updateAqsSensor(deviceId, devices, message, rssi):
     iaqRecord = Common.findRecord(message, OpenThings.PARAM_IAQ)
 
     batteryVoltage = Common.roundRecordValue(batteryVoltageRecord, 2)
-    temperature = Common.roundRecordValue(temperatureRecord, 2)
+    temperature = Common.roundRecordValue(temperatureRecord, 1)
     humidity = Common.roundRecordValue(humidityRecord, 2)
     batteryLevel = Common.roundRecordValue(batteryLevelRecord, 2)
     iaq = Common.roundRecordValue(iaqRecord, 2)
@@ -119,7 +119,7 @@ def updateAqsSensor(deviceId, devices, message, rssi):
     devices[deviceId].Units[ECO2_UNIT].Update(Log=True)
 
     devices[deviceId].Units[TEMP_HUM_UNIT].nValue = temperature
-    devices[deviceId].Units[TEMP_HUM_UNIT].sValue = str(temperature) + ";" + str(humidity) + ";"
+    devices[deviceId].Units[TEMP_HUM_UNIT].sValue = str(temperature) + ";" + str(humidity) + ";0"
     devices[deviceId].Units[TEMP_HUM_UNIT].BatteryLevel = batteryLevel
     devices[deviceId].Units[TEMP_HUM_UNIT].SignalLevel = rssi
     devices[deviceId].Units[TEMP_HUM_UNIT].Update(Log=True)

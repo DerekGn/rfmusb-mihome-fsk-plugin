@@ -119,7 +119,7 @@ def updateAqsSensor(deviceId, devices, message, rssi):
     devices[deviceId].Units[ECO2_UNIT].Update(Log=True)
 
     devices[deviceId].Units[TEMP_HUM_UNIT].nValue = temperature
-    devices[deviceId].Units[TEMP_HUM_UNIT].sValue = str(temperature) + " C;" + str(humidity) + " %"
+    devices[deviceId].Units[TEMP_HUM_UNIT].sValue = str(temperature) + ";" + str(humidity) + ";"
     devices[deviceId].Units[TEMP_HUM_UNIT].BatteryLevel = batteryLevel
     devices[deviceId].Units[TEMP_HUM_UNIT].SignalLevel = rssi
     devices[deviceId].Units[TEMP_HUM_UNIT].Update(Log=True)

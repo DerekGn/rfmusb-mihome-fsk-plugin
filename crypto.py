@@ -1,4 +1,4 @@
-# crypto.py  27/09/2015  D.J.Whale
+# Crypto.py  27/09/2015  D.J.Whale
 #
 # Crypto engine for OpenThings, including crc calculation
 

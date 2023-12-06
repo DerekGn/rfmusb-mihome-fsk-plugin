@@ -6,9 +6,9 @@
 
 import time
 try:
-	import crypto # python 2
+	import Crypto # python 2
 except ImportError:
-	from . import crypto # python 3
+	from . import Crypto # python 3
 
 class OpenThingsException(Exception):
 	def __init__(self, value):
@@ -68,30 +68,22 @@ PARAM_WATER_PRESSURE  = 0x78
 PARAM_PHASE1_POWER 	  = 0x79
 PARAM_PHASE2_POWER    = 0x7A
 PARAM_PHASE3_POWER    = 0x7B
-PARAM_THREE_PHASE_TOTAL_POWER = 0x7C
-PARAM_VOC_INDEX 	  		= 0x7D
-PARAM_CURRENT_L 			= 0x7E
-PARAM_PHASE_ANGLE_L 		= 0x7F
-PARAM_ACTIVE_POWER_L 		= 0x80
-PARAM_POWER_FACTOR_L 		= 0x81
-PARAM_REACTIVE_POWER_L 		= 0x82
-PARAM_APPARENT_POWER_L 		= 0x83
-PARAM_CURRENT_N 			= 0x84
-PARAM_PHASE_ANGLE_N 		= 0x85
-PARAM_ACTIVE_POWER_N 		= 0x86
-PARAM_POWER_FACTOR_N 		= 0x87
-PARAM_REACTIVE_POWER_N 		= 0x88
-PARAM_APPARENT_POWER_N 		= 0x89
-PARAM_FWD_ACTIVE_ENERGY 	= 0x8A
-PARAM_REV_ACTIVE_ENERGY 	= 0x8B
-PARAM_ABS_ACTIVE_ENERGY 	= 0x8C
-PARAM_FWD_REACTIVE_ENERGY 	= 0x8D
-PARAM_REV_REACTIVE_ENERGY 	= 0x8E
-PARAM_ABS_REACTIVE_ENERGY 	= 0x8F
+PARAM_THREE_PHASE_TOTAL_POWER 	= 0x7C
+
+PARAM_BATTERY_VOLTAGE   = 0x01
+PARAM_IAQ			    = 0x02
+PARAM_TVOC				= 0x03
+PARAM_ETOH				= 0x04
+PARAM_ECO2				= 0x05
 
 PARAM_TEST            = 0xAA
 
 param_info = {
+	PARAM_BATTERY_VOLTAGE : {"n":"PARAM_BATTERY_VOLTAGE", "u":""},
+	PARAM_IAQ             : {"n":"PARAM_IAQ", 			"u":""},
+	PARAM_TVOC            : {"n":"PARAM_TVOC", 			"u":""},
+	PARAM_ETOH            : {"n":"PARAM_ETOH", 			"u":""},
+	PARAM_ECO2            : {"n":"PARAM_ECO2", 			"u":""},
 	PARAM_ALARM           : {"n":"ALARM",				"u":""},
 	PARAM_DEBUG_OUTPUT    : {"n":"DEBUG_OUTPUT",		"u":""},
 	PARAM_IDENTIFY        : {"n":"IDENTIFY",			"u":""},
@@ -136,25 +128,6 @@ param_info = {
 	PARAM_VOLTAGE         : {"n":"VOLTAGE",				"u":"V"},
 	PARAM_WATER_FLOW_RATE : {"n":"WATER_FLOW_RATE",		"u":"l/hr"},
 	PARAM_WATER_PRESSURE  : {"n":"WATER_PRESSURE",		"u":"Pa"},
-	PARAM_VOC_INDEX       : {"n":"VOC_INDEX",		    "u":""},
-	PARAM_CURRENT_L 	  : {"n":"CURRENT",		    	"u":"A"},
-	PARAM_PHASE_ANGLE_L   : {"n":"PHASE_ANGLE",	    	"u":"°"},
-	PARAM_ACTIVE_POWER_L  : {"n":"ACTIVE_POWER",    	"u":"kW"},
-	PARAM_POWER_FACTOR_L  : {"n":"POWER_FACTOR",    	"u":""},
-	PARAM_REACTIVE_POWER_L : {"n":"REACTIVE_POWER",    	"u":"kvar"},
-	PARAM_APPARENT_POWER_L : {"n":"APPARENT_POWER",    	"u":"kVA"},
-	PARAM_CURRENT_N 	   : {"n":"CURRENT",	    	"u":"A"},
-	PARAM_PHASE_ANGLE_N    : {"n":"PHASE_ANGLE",	    "u":"°"},
-	PARAM_ACTIVE_POWER_N   : {"n":"ACTIVE_POWER",    	"u":"kW"},
-	PARAM_POWER_FACTOR_N   : {"n":"POWER_FACTOR",    	"u":""},
-	PARAM_REACTIVE_POWER_N : {"n":"REACTIVE_POWER",    	"u":"kvar"},
-	PARAM_APPARENT_POWER_N : {"n":"APPARENT_POWER",    	"u":"kVA"},
-	PARAM_FWD_ACTIVE_ENERGY : {"n":"FWD_ACTIVE_ENERGY", "u":""},
-	PARAM_REV_ACTIVE_ENERGY : {"n":"REV_ACTIVE_ENERGY", "u":""},
-	PARAM_ABS_ACTIVE_ENERGY : {"n":"ABS_ACTIVE_ENERGY", "u":""},
-	PARAM_FWD_REACTIVE_ENERGY : {"n":"FWD_REACTIVE_ENERGY", "u":""},
-	PARAM_REV_REACTIVE_ENERGY : {"n":"REV_REACTIVE_ENERGY", "u":""},
-	PARAM_ABS_REACTIVE_ENERGY : {"n":"ABS_REACTIVE_ENERGY", "u":""},
 }
 
 
@@ -208,8 +181,8 @@ def decode(payload):
 	if encryptPIP != 0:
 		# DECRYPT PAYLOAD
 		# [0]len,mfrid,productid,pipH,pipL,[5]
-		crypto.init(crypt_pid, encryptPIP)
-		crypto.cryptPayload(payload, 5, len(payload)-5) # including CRC
+		Crypto.init(crypt_pid, encryptPIP)
+		Crypto.cryptPayload(payload, 5, len(payload)-5) # including CRC
 		#printhex(payload)
 	# sensorId is in encrypted region
 	sensorId = (payload[5]<<16) + (payload[6]<<8) + payload[7]
@@ -357,8 +330,8 @@ def encode(spec, encrypt=True):
 	if encrypt:
 		# ENCRYPT
 		# [0]len,mfrid,productid,pipH,pipL,[5]
-		crypto.init(crypt_pid, encryptPIP)
-		crypto.cryptPayload(payload, 5, len(payload)-5) # including CRC
+		Crypto.init(crypt_pid, encryptPIP)
+		Crypto.cryptPayload(payload, 5, len(payload)-5) # including CRC
 
 	return payload
 

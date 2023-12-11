@@ -233,20 +233,22 @@ class BasePlugin:
         manufacturerId = header["mfrid"]
 
         deviceId = Common.createDeviceId(productId, manufacturerId, sensorId)
+        join = Common.findRecord(message, OpenThings.PARAM_JOIN)
+        deviceExists = self.deviceExists(deviceId)
 
-        Domoticz.Debug("DeviceId: " + deviceId)
-
-        if(not self.deviceExists(deviceId)):
-            join = Common.findRecord(message, OpenThings.PARAM_JOIN)
+        if(join is not None):
             Domoticz.Debug("Join: " + str(join))
-            if(join is not None):
-                Domoticz.Log("Join Message From SensorId: "+str(sensorId))
+            if(not deviceExists):
+                Domoticz.Log("Join Message From DeviceId: [" + str(deviceId) + "]")
                 self.addDevice(manufacturerId, deviceId, productId)
             else:
-                Domoticz.Log("SensorId: "+str(sensorId) + "not joined")
+                Domoticz.Log("DeviceId: [" + str(deviceId) + "] Already Joined")
         else:
-            Domoticz.Debug("Updating Device DeviceId: "+str(deviceId))
-            self.updateDevice(deviceId, manufacturerId, productId, message)
+            if(deviceExists):
+                Domoticz.Debug("Updating DeviceId: [" + str(deviceId) + "]")
+                self.updateDevice(deviceId, manufacturerId, productId, message)
+            else:
+                Domoticz.log("DeviceId: [" + str(deviceId) + "] Not Found")
 
     def addDevice(self, manufacturerId, deviceId, productId):
         if(manufacturerId == Energine.MFRID_ENERGENIE):
@@ -254,7 +256,7 @@ class BasePlugin:
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
             AxioLogix.createDevice(deviceId, productId)
         else:
-            Domoticz.Error("Unknown Product Id: " + str(productId))
+            Domoticz.Error("Unknown Product Id: [" + str(productId) + "]")
 
     def updateDevice(self, deviceId, manufacturerId, productId, message):
         if(manufacturerId == Energine.MFRID_ENERGENIE):

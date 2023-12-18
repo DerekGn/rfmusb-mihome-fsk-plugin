@@ -248,7 +248,7 @@ class BasePlugin:
                 Domoticz.Debug("Updating DeviceId: [" + str(deviceId) + "]")
                 self.updateDevice(deviceId, manufacturerId, productId, message)
             else:
-                Domoticz.log("DeviceId: [" + str(deviceId) + "] Not Found")
+                Domoticz.Log("DeviceId: [" + str(deviceId) + "] Not Found")
 
     def addDevice(self, manufacturerId, deviceId, productId):
         if(manufacturerId == Energine.MFRID_ENERGENIE):

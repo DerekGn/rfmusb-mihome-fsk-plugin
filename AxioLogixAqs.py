@@ -18,7 +18,7 @@ TEMP_HUM_UNIT = 6
 VBATT_UNIT = 7
 
 AIR_QUALITY_LEVEL_LIMIT = [1.9,2.9,3.9,4.9,5]
-AIR_QUALITY_LEVEL_CONDITION = ["Very Good","Good","Medium","Poor","Bad"]
+AIR_QUALITY_LEVEL_CONDITION = ["None","Very Good","Good","Medium","Poor","Bad"]
 
 def createAqsSensor(deviceId):
     Domoticz.Log("Creating Aqs Sensor Id: " + deviceId)
@@ -133,19 +133,19 @@ def updateAqsSensor(deviceId, devices, message, rssi):
 def calculateIAQLevel(iaq):
     level = 0
 
-    if iaq <= AIR_QUALITY_LEVEL_LIMIT[0]:
-        level = 0
-
-    if iaq > AIR_QUALITY_LEVEL_LIMIT[0] and iaq <= AIR_QUALITY_LEVEL_LIMIT[1]:
+    if iaq > 0 and iaq <= AIR_QUALITY_LEVEL_LIMIT[0]:
         level = 1
 
-    if iaq > AIR_QUALITY_LEVEL_LIMIT[1] and iaq <= AIR_QUALITY_LEVEL_LIMIT[2]:
+    if iaq > AIR_QUALITY_LEVEL_LIMIT[0] and iaq <= AIR_QUALITY_LEVEL_LIMIT[1]:
         level = 2
 
-    if iaq > AIR_QUALITY_LEVEL_LIMIT[2] and iaq <= AIR_QUALITY_LEVEL_LIMIT[3]:
+    if iaq > AIR_QUALITY_LEVEL_LIMIT[1] and iaq <= AIR_QUALITY_LEVEL_LIMIT[2]:
         level = 3
+
+    if iaq > AIR_QUALITY_LEVEL_LIMIT[2] and iaq <= AIR_QUALITY_LEVEL_LIMIT[3]:
+        level = 4
     
     if iaq > AIR_QUALITY_LEVEL_LIMIT[4]:
-        level = 4
+        level = 5
     
     return level

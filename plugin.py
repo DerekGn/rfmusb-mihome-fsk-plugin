@@ -180,8 +180,8 @@ class BasePlugin:
                 Domoticz.Debug("Serial Data: ["+strData+"]")
                 self.sendCommand(self.CMD_GET_FIFO)
             elif(self.LastCommand == self.CMD_GET_LAST_RSSI):
-                Domoticz.Debug("Command Executed: ["+self.LastCommand+"] Response: ["+strData+"] ")
-                self.LastRssi = int(strData, 16)
+                #self.LastRssi = self.twos_complement(strData.replace("0x", ""), 32)
+                Domoticz.Debug("Command Executed: ["+self.LastCommand+"] Response: ["+strData+"] Rssi: ["+ str(self.LastRssi) +"]")
             elif(self.LastCommand == self.CMD_GET_FIFO):
                 Domoticz.Debug("Command Executed: ["+self.LastCommand+"] Response: ["+strData+"] ")
                 # Decode the fifo data
@@ -270,6 +270,12 @@ class BasePlugin:
                 return True
 
         return False
+    
+    def twos_complement(self, hexstr, bits):
+        value = int(hexstr, 16)
+        if value & (1 << (bits - 1)):
+            value -= 1 << bits
+        return value
 
 
 global _plugin

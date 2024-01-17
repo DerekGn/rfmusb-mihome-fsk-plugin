@@ -77,6 +77,7 @@ def updateAqsSensor(deviceId, devices, message, rssi):
     iaqtext = AIR_QUALITY_LEVEL_CONDITION[iaqLevel]
 
     Domoticz.Debug("Updating AQS Sensor Id: [" + str(deviceId) + "] "
+                   "RSSI: [" + str(rssi) + "] " +
                    "IAQ: [" + str(iaq) + "] " +
                    "TVOC: [" + str(tvoc) + "] " +
                    "ETOH: [" + str(etoh) + "] " +

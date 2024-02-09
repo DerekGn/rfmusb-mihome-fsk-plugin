@@ -70,20 +70,9 @@ PARAM_PHASE2_POWER    = 0x7A
 PARAM_PHASE3_POWER    = 0x7B
 PARAM_THREE_PHASE_TOTAL_POWER 	= 0x7C
 
-PARAM_BATTERY_VOLTAGE   = 0x01
-PARAM_IAQ			    = 0x02
-PARAM_TVOC				= 0x03
-PARAM_ETOH				= 0x04
-PARAM_ECO2				= 0x05
-
 PARAM_TEST            = 0xAA
 
 param_info = {
-	PARAM_BATTERY_VOLTAGE : {"n":"PARAM_BATTERY_VOLTAGE", "u":""},
-	PARAM_IAQ             : {"n":"PARAM_IAQ", 			"u":""},
-	PARAM_TVOC            : {"n":"PARAM_TVOC", 			"u":""},
-	PARAM_ETOH            : {"n":"PARAM_ETOH", 			"u":""},
-	PARAM_ECO2            : {"n":"PARAM_ECO2", 			"u":""},
 	PARAM_ALARM           : {"n":"ALARM",				"u":""},
 	PARAM_DEBUG_OUTPUT    : {"n":"DEBUG_OUTPUT",		"u":""},
 	PARAM_IDENTIFY        : {"n":"IDENTIFY",			"u":""},

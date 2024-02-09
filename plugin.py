@@ -157,7 +157,10 @@ class BasePlugin:
         if(self.IsInitalised == False):
             
             Domoticz.Debug("Command Executed: ["+self.LastCommand+"] Response: ["+strData+"] ")
-            
+
+            if(self.LastCommand.startswith(self.CMD_GET_FIRMWARE_VERSION)):
+                Domoticz.Log("Rfm Firmware Version: " + strData)
+
             if(self.CommandIndex < len(self.InitCommands)):
                 if(self.InitCommands[self.CommandIndex].startswith(self.CMD_SET_RSSI_THRESHOLD)):
                     self.sendCommand(self.CMD_SET_RSSI_THRESHOLD + " " + str(Parameters["Mode3"]))
@@ -212,15 +215,10 @@ class BasePlugin:
         try:
             fifo = bytearray.fromhex(data)
             length = fifo[0]
-            if(length > 10 and length+1 < 64):
-                message = fifo[0:length+1]
-                Domoticz.Debug("Message: " + "".join("%02x" %
-                                                     b for b in message))
-                openthingsMessage = OpenThings.decode(message)
-                self.handleMessage(openthingsMessage)
-            else:
-                Domoticz.Debug(
-                    "Received Message Length out of range: " + str(length))
+            message = fifo[0:length + 1]
+            Domoticz.Debug("Message: " + "".join("%02x" % b for b in message) + " Length: " + str(length))
+            openthingsMessage = OpenThings.decode(message)
+            self.handleMessage(openthingsMessage)
         except OpenThings.OpenThingsException as error:
             errorMessage = str(error)
             Domoticz.Error("Unable to decode payload: " + errorMessage)

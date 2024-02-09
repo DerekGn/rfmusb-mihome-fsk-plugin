@@ -3,7 +3,7 @@
 # Author: DerekGn
 #
 import DomoticzEx as Domoticz
-import DeviceTypes
+import Types
 import OpenThings
 import Common
 
@@ -11,8 +11,10 @@ PRODUCTID_TEMPHUMIDITY = 0x01
 
 def createTempHumiditySensor(deviceId):
     Domoticz.Log("Creating Temp Humidity Sensor Id: " + str(deviceId))
-    Domoticz.Unit(Name="Temp Humidity Sensor", DeviceID=deviceId, Unit=1,
-                  TypeName="Temp+Hum", Type=DeviceTypes.DEVICE_TYPE_TEMP_HUMIDITY,
+    Domoticz.Unit(Name="Temp Humidity Sensor",
+                  DeviceID=deviceId, Unit=1,
+                  TypeName="Temp+Hum",
+                  Type=Types.TYPE_TEMP_HUMIDITY,
                   Description="RfmTemp Sensor").Create()
 
 def updateTemperatureHumiditySensor(deviceId, devices, message, rssi):

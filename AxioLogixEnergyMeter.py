@@ -46,84 +46,78 @@ def createEnergyMeterSensor(deviceId):
     createLineMeasurements(deviceId, 9, 'N')
     createEnergyMeasurements(deviceId, 15)
 
-def createLineMeasurements(deviceId, startIndex, line):
+def createLineMeasurements(deviceId, unitId, line):
     Domoticz.Log("Creating Energy Meter Sensor Id: " + str(deviceId) + " Line Measurements " + line)
-    Domoticz.Unit(Name="Energy Meter " + line + " Current", DeviceID=deviceId, Unit=startIndex,
+    Domoticz.Unit(Name="Energy Meter " + line + " Current", DeviceID=deviceId, Unit=unitId,
                     Type=Types.TYPE_GENERAL,
                     Subtype=SubTypes.SUB_TYPE_CUSTOM,
                     Options={'Custom': '1;Irms'},
                     Description=line + " Line Rms Current").Create()
-    startIndex += 1
-    Domoticz.Unit(Name="Energy Meter " + line + " Phase", DeviceID=deviceId, Unit=startIndex,
+    unitId += 1
+    Domoticz.Unit(Name="Energy Meter " + line + " Phase", DeviceID=deviceId, Unit=unitId,
                     Type=Types.TYPE_GENERAL,
                     Subtype=SubTypes.SUB_TYPE_CUSTOM,
                     Options={'Custom': '1;°'},
                     Description="Phase Angle between Voltage and " + line + " Line Current").Create()
-    startIndex += 1
-    Domoticz.Unit(Name="Energy Meter " + line + " PMean", DeviceID=deviceId, Unit=startIndex,
+    unitId += 1
+    Domoticz.Unit(Name="Energy Meter " + line + " PMean", DeviceID=deviceId, Unit=unitId,
                     Type=Types.TYPE_GENERAL,
                     Subtype=SubTypes.SUB_TYPE_CUSTOM,
                     Options={'Custom': '1;kW'},
                     Description=line + " Line Mean Active Power").Create()
-    startIndex += 1
-    Domoticz.Unit(Name="Energy Meter " + line + " QMean", DeviceID=deviceId, Unit=startIndex,
+    unitId += 1
+    Domoticz.Unit(Name="Energy Meter " + line + " QMean", DeviceID=deviceId, Unit=unitId,
                     Type=Types.TYPE_GENERAL,
                     Subtype=SubTypes.SUB_TYPE_CUSTOM,
                     Options={'Custom': '1;kvar'},
                     Description=line + " Line Mean Reactive Power").Create()
-    startIndex += 1
-    Domoticz.Unit(Name="Energy Meter " + line + "Power Factor", DeviceID=deviceId, Unit=startIndex,
+    unitId += 1
+    Domoticz.Unit(Name="Energy Meter " + line + "Power Factor", DeviceID=deviceId, Unit=unitId,
                     Type=Types.TYPE_GENERAL,
                     Subtype=SubTypes.SUB_TYPE_CUSTOM,
                     Description=line + " Line Power Factor").Create()
-    startIndex += 1
-    Domoticz.Unit(Name="Energy Meter " + line + " SMean", DeviceID=deviceId, Unit=startIndex,
+    unitId += 1
+    Domoticz.Unit(Name="Energy Meter " + line + " SMean", DeviceID=deviceId, Unit=unitId,
                     Type=Types.TYPE_GENERAL,
                     Subtype=SubTypes.SUB_TYPE_CUSTOM,
                     Options={'Custom': '1;kVA'},
                     Description=line + " Line Mean Apparent Power").Create()
 
-def createEnergyMeasurements(deviceId, startIndex):
+def createEnergyMeasurements(deviceId, unitId):
     Domoticz.Log("Creating Energy Meter Sensor Id: " + str(deviceId) + " Energy Measurements")
-    Domoticz.Unit(Name="Energy Meter Absolute Active Energy", DeviceID=deviceId, Unit=startIndex,
+    Domoticz.Unit(Name="Energy Meter Absolute Active Energy", DeviceID=deviceId, Unit=unitId,
                     Type=Types.TYPE_GENERAL,
-                    Subtype=SubTypes.SUB_TYPE_COUNTER_INC,
-                    SwitchType=0,
+                    Subtype=SubTypes.SUB_TYPE_CUSTOM,
                     Options={'Custom': '1;KWh'},
                     Description="Energy Meter Absolute Active Energy").Create()
-    startIndex += 1
-    Domoticz.Unit(Name="Energy Meter Absolute Reactive Energy", DeviceID=deviceId, Unit=startIndex,
+    unitId += 1
+    Domoticz.Unit(Name="Energy Meter Absolute Reactive Energy", DeviceID=deviceId, Unit=unitId,
                     Type=Types.TYPE_GENERAL,
-                    Subtype=SubTypes.SUB_TYPE_COUNTER_INC,
-                    SwitchType=0,
+                    Subtype=SubTypes.SUB_TYPE_CUSTOM,
                     Options={'Custom': '1;KWh'},
                     Description="Energy Meter Absolute Reactive Energy").Create()
-    startIndex += 1
-    Domoticz.Unit(Name="Energy Meter Forward Active Energy", DeviceID=deviceId, Unit=startIndex,
+    unitId += 1
+    Domoticz.Unit(Name="Energy Meter Forward Active Energy", DeviceID=deviceId, Unit=unitId,
                     Type=Types.TYPE_GENERAL,
-                    Subtype=SubTypes.SUB_TYPE_COUNTER_INC,
-                    SwitchType=0,
+                    Subtype=SubTypes.SUB_TYPE_CUSTOM,
                     Options={'Custom': '1;KWh'},
                     Description="Energy Meter Forward Active Energy").Create()
-    startIndex += 1
-    Domoticz.Unit(Name="Energy Meter Forward Reactive Energy", DeviceID=deviceId, Unit=startIndex,
+    unitId += 1
+    Domoticz.Unit(Name="Energy Meter Forward Reactive Energy", DeviceID=deviceId, Unit=unitId,
                     Type=Types.TYPE_GENERAL,
-                    Subtype=SubTypes.SUB_TYPE_COUNTER_INC,
-                    SwitchType=0,
+                    Subtype=SubTypes.SUB_TYPE_CUSTOM,
                     Options={'Custom': '1;KWh'},
                     Description="Energy Meter Forward Reactive Energy").Create()
-    startIndex += 1
-    Domoticz.Unit(Name="Energy Meter Reverse Active Energy", DeviceID=deviceId, Unit=startIndex,
+    unitId += 1
+    Domoticz.Unit(Name="Energy Meter Reverse Active Energy", DeviceID=deviceId, Unit=unitId,
                     Type=Types.TYPE_GENERAL,
-                    Subtype=SubTypes.SUB_TYPE_COUNTER_INC,
-                    SwitchType=0,
+                    Subtype=SubTypes.SUB_TYPE_CUSTOM,
                     Options={'Custom': '1;KWh'},
                     Description="Energy Meter Reverse Active Energy").Create()
-    startIndex += 1
-    Domoticz.Unit(Name="Energy Meter Reverse Reactive Energy", DeviceID=deviceId, Unit=startIndex,
+    unitId += 1
+    Domoticz.Unit(Name="Energy Meter Reverse Reactive Energy", DeviceID=deviceId, Unit=unitId,
                     Type=Types.TYPE_GENERAL,
-                    Subtype=SubTypes.SUB_TYPE_COUNTER_INC,
-                    SwitchType=0,
+                    Subtype=SubTypes.SUB_TYPE_CUSTOM,
                     Options={'Custom': '1;KWh'},
                     Description="Energy Meter Reverse Reactive Energy").Create()
 
@@ -179,88 +173,88 @@ def updateEnergyMeterSensor(deviceId, devices, message, rssi):
     updateEnergyMeasurements(device, message, 15, rssi)
 
 def updateLineMeasurements(device, currentRecord, phaseRecord, activePowerRecord,
-                           powerFactorRecord, reactivePowerRecord, apparentPowerRecord, startIndex, rssi):
+                           powerFactorRecord, reactivePowerRecord, apparentPowerRecord, unitId, rssi):
     # Current
     if(currentRecord["length"] != 0):
-        device.Units[startIndex].nValue=round(currentRecord["value"] / 1000.0, 2)
-    device.Units[startIndex].SignalLevel = rssi
-    device.Units[startIndex].Update()
-    startIndex += 1
+        device.Units[unitId].nValue=round(currentRecord["value"] / 1000.0, 2)
+    device.Units[unitId].SignalLevel = rssi
+    device.Units[unitId].Update()
+    unitId += 1
     # Phase
     if(phaseRecord["length"] != 0):
-        device.Units[startIndex].nValue=round(phaseRecord["value"] / 10.0, 2)
-    device.Units[startIndex].SignalLevel = rssi
-    device.Units[startIndex].Update()
-    startIndex += 1
+        device.Units[unitId].nValue=round(phaseRecord["value"] / 10.0, 2)
+    device.Units[unitId].SignalLevel = rssi
+    device.Units[unitId].Update()
+    unitId += 1
     # Mean Active Power
     if(activePowerRecord["length"] != 0):
-        device.Units[startIndex].nValue=round(activePowerRecord["value"] / 1000.0, 2)
-    device.Units[startIndex].SignalLevel = rssi
-    device.Units[startIndex].Update()
-    startIndex += 1
+        device.Units[unitId].nValue=round(activePowerRecord["value"] / 1000.0, 2)
+    device.Units[unitId].SignalLevel = rssi
+    device.Units[unitId].Update()
+    unitId += 1
     # Mean Reactive Power
     if(reactivePowerRecord["length"] != 0):
-        device.Units[startIndex].nValue=round(reactivePowerRecord["value"] / 1000.0, 2)
-    device.Units[startIndex].SignalLevel = rssi
-    device.Units[startIndex].Update()
-    startIndex += 1
+        device.Units[unitId].nValue=round(reactivePowerRecord["value"] / 1000.0, 2)
+    device.Units[unitId].SignalLevel = rssi
+    device.Units[unitId].Update()
+    unitId += 1
     # Power Factor
     if(powerFactorRecord["length"] != 0):
-        device.Units[startIndex].nValue=round(powerFactorRecord["value"] / 1000.0,2)
-    device.Units[startIndex].SignalLevel = rssi
-    device.Units[startIndex].Update()
-    startIndex += 1
+        device.Units[unitId].nValue=round(powerFactorRecord["value"] / 1000.0,2)
+    device.Units[unitId].SignalLevel = rssi
+    device.Units[unitId].Update()
+    unitId += 1
     # Apparent Power
     if(apparentPowerRecord["length"] != 0):
-        device.Units[startIndex].nValue=round(apparentPowerRecord["value"],2)
-    device.Units[startIndex].SignalLevel = rssi
-    device.Units[startIndex].Update()
+        device.Units[unitId].nValue=round(apparentPowerRecord["value"],2)
+    device.Units[unitId].SignalLevel = rssi
+    device.Units[unitId].Update()
 
-def updateEnergyMeasurements(device, message, startIndex, rssi):
+def updateEnergyMeasurements(device, message, unitId, rssi):
     # Absolute Active Energy
     record = Common.findRecord(message, PARAM_ABS_ACTIVE_ENERGY)
     if(record["length"] != 0):
-        device.Units[startIndex].sValue=str(round(record["value"] * 0.1, 2))
-    device.Units[startIndex].SignalLevel = rssi
-    device.Units[startIndex].nValue=0
-    device.Units[startIndex].Update()
-    startIndex += 1
+        device.Units[unitId].sValue=str(round(record["value"] * 0.1, 2))
+    device.Units[unitId].SignalLevel = rssi
+    device.Units[unitId].nValue=0
+    device.Units[unitId].Update()
+    unitId += 1
     # Absolute Reactive Energy
     record = Common.findRecord(message, PARAM_ABS_REACTIVE_ENERGY)
     if(record["length"] != 0):
-        device.Units[startIndex].sValue=str(round(record["value"] * 0.1, 2))
-    device.Units[startIndex].SignalLevel = rssi
-    device.Units[startIndex].nValue=0
-    device.Units[startIndex].Update()
-    startIndex += 1
+        device.Units[unitId].sValue=str(round(record["value"] * 0.1, 2))
+    device.Units[unitId].SignalLevel = rssi
+    device.Units[unitId].nValue=0
+    device.Units[unitId].Update()
+    unitId += 1
     # Forward Active Energy
     record = Common.findRecord(message, PARAM_FWD_ACTIVE_ENERGY)
     if(record["length"] != 0):
-        device.Units[startIndex].sValue=str(round(record["value"] * 0.1, 2))
-    device.Units[startIndex].SignalLevel = rssi
-    device.Units[startIndex].nValue=0
-    device.Units[startIndex].Update()
-    startIndex += 1
+        device.Units[unitId].sValue=str(round(record["value"] * 0.1, 2))
+    device.Units[unitId].SignalLevel = rssi
+    device.Units[unitId].nValue=0
+    device.Units[unitId].Update()
+    unitId += 1
     # Forward Reactive Energy
     record = Common.findRecord(message, PARAM_FWD_REACTIVE_ENERGY)
     if(record["length"] != 0):
-        device.Units[startIndex].sValue=str(round(record["value"] * 0.1, 2))
-    device.Units[startIndex].SignalLevel = rssi
-    device.Units[startIndex].nValue=0
-    device.Units[startIndex].Update()
-    startIndex += 1
+        device.Units[unitId].sValue=str(round(record["value"] * 0.1, 2))
+    device.Units[unitId].SignalLevel = rssi
+    device.Units[unitId].nValue=0
+    device.Units[unitId].Update()
+    unitId += 1
     # Reverse Active Energy
     record = Common.findRecord(message, PARAM_REV_ACTIVE_ENERGY)
     if(record["length"] != 0):
-        device.Units[startIndex].sValue=str(round(record["value"] * 0.1, 2))
-    device.Units[startIndex].SignalLevel = rssi
-    device.Units[startIndex].nValue=0
-    device.Units[startIndex].Update()
-    startIndex += 1
+        device.Units[unitId].sValue=str(round(record["value"] * 0.1, 2))
+    device.Units[unitId].SignalLevel = rssi
+    device.Units[unitId].nValue=0
+    device.Units[unitId].Update()
+    unitId += 1
     # Reverse Reactive Energy
     record = Common.findRecord(message, PARAM_REV_REACTIVE_ENERGY)
     if(record["length"] != 0):
-        device.Units[startIndex].sValue=str(round(record["value"] * 0.1, 2))
-    device.Units[startIndex].SignalLevel = rssi
-    device.Units[startIndex].nValue=0
-    device.Units[startIndex].Update()
+        device.Units[unitId].sValue=str(round(record["value"] * 0.1, 2))
+    device.Units[unitId].SignalLevel = rssi
+    device.Units[unitId].nValue=0
+    device.Units[unitId].Update()

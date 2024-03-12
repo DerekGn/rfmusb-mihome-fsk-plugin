@@ -5,7 +5,7 @@
 """
 <plugin key="RfmEnergFsk" name="RfmUsb Energenie FSK" author="DerekGn" version="1.0.0" wikilink="http://www.domoticz.com/wiki/plugins/plugin.html" externallink="https://github.com/DerekGn/rfmusb-mihome-fsk-plugin">
     <description>
-        <h2>RfmUsb Energenie Fsk Devices Plugin</h2>
+        <h2>RfmUsb Energenie Fsk Devices Plugin Version: 1.0.0</h2>
         <br/>
         The RfmUsb Energenie Fsk Devices Plugin allows controlling various Energenie Fsk devices.
         <h3>Features</h3>
@@ -81,35 +81,36 @@ class BasePlugin:
     CMD_SET_OUTPUT_POWER = "s-op"
     CMD_GET_LAST_RSSI = "g-lrssi"
     CMD_SET_STANDBY = "e-om 1"
-    CMD_GET_FIFO = "g-fifo"
+    CMD_READ_BUFFER = "r-b"
     CMD_SET_RX = "s-om 4"
-    
-    RESPONSE_IRQ_RSSI = "DIO PIN IRQ [0x08]"
-    RESPONSE_IRQ_RX = "DIO PIN IRQ [0x01]"
+
+    RESPONSE_MODE_RX = "OK-[0x0004]-Rx"
+    RESPONSE_IRQ = "DIO PIN IRQ"
     RESPONSE_OK = "OK"
     
     InitCommands = [
-        "e-r",
-        "s-mt 0",
-        "s-fd 0x01EC",
-        "s-f 434300000",
-        "s-rxbw 14",
-        "s-br 4800",
-        "s-ss 1",
-        "s-se 1",
-        "s-sbe 0",
-        "s-sync 2DD4",
-        "s-pf 0",
-        "s-dfe 1",
-        "s-crc 0",
-        "s-caco 0",
-        "s-af 0",
-        "s-pl 66",
-        "s-dio 0 1",
-        "s-dio 3 1",
-        "s-dim 0x9",
-        "s-rt",
-        "s-op"
+        "e-r",              # Reset the radio device
+        "s-mt 0",           # Set modulation to FSK
+        "s-fd 0x01EC",      # Set frequency deviation to ± 30kHz
+        "s-f 434300000",    # Set frequency 434.300 MHz
+        "s-rxbw 14",        # Set the rx bandwidth to 62 khz
+        "s-br 4800",        # Baud rate 4800
+        "s-ss 1",           # Set sync size to 1
+        "s-se 1",           # Set sync enable
+        "s-sbe 0",          # Set single bit error
+        "s-sync 2DD4",      # Set the sync to 0x2D 0xD4
+        "s-pf 1",           # Set packet format to variable
+        "s-dfe 1",          # Set DC free encoding to manchester
+        "s-crc 0",          # Set crc off
+        "s-caco 0",         # Set crc auto clear off
+        "s-af 0",           # Set address filter off
+        "s-pl 0xFF",        # Set max packet length to 0xFF
+        "s-dio 0 1",        # Set DIO 0 mapping to 1 for payload ready IRQ
+        "s-dio 1 2",        # Set DIO 3 mapping to 1 for fifo not empty
+        "s-dim 0x3",        # Set Irq mask to 3 
+        "s-be 1",           # Enable buffered IO
+        #"s-rt",             # Set the receive threshold
+        "s-op"              # Set the output power
     ]
 
     LastCommand = ""
@@ -154,17 +155,22 @@ class BasePlugin:
         strData = Data.decode("ascii")
         strData = strData.replace("\n", "")
 
-        Domoticz.Debug("Command Executed: ["+self.LastCommand+"] Response: ["+strData+"] ")
-
+        if(self.LastCommand != ""):
+            Domoticz.Debug("Command Executed: ["+self.LastCommand+"] Response: ["+strData+"]")
+        else:
+            Domoticz.Debug("Serial Data: ["+strData+"]")
+            
         if(self.IsInitalised == False):
             if(self.LastCommand.startswith(self.CMD_GET_FIRMWARE_VERSION)):
                 Domoticz.Log("Rfm Firmware Version: " + strData)
 
             if(self.CommandIndex < len(self.InitCommands)):
-                if(self.InitCommands[self.CommandIndex].startswith(self.CMD_SET_RSSI_THRESHOLD)):
-                    self.sendCommand(self.CMD_SET_RSSI_THRESHOLD + " " + str(Parameters["Mode3"]))
-                elif(self.InitCommands[self.CommandIndex].startswith(self.CMD_SET_OUTPUT_POWER)):
-                    self.sendCommand(self.CMD_SET_OUTPUT_POWER + " " + str(Parameters["Mode4"]))
+                # if(self.InitCommands[self.CommandIndex].startswith(self.CMD_SET_RSSI_THRESHOLD)):
+                #     self.sendCommand(self.CMD_SET_RSSI_THRESHOLD + " " + str(Parameters["Mode3"]))
+                # elif(self.InitCommands[self.CommandIndex].startswith(self.CMD_SET_OUTPUT_POWER)):
+                #     self.sendCommand(self.CMD_SET_OUTPUT_POWER + " " + str(Parameters["Mode4"]))
+                if(self.InitCommands[self.CommandIndex].startswith(self.CMD_SET_OUTPUT_POWER)):
+                     self.sendCommand(self.CMD_SET_OUTPUT_POWER + " " + str(Parameters["Mode4"]))
                 else:
                     self.sendCommand(self.InitCommands[self.CommandIndex])
 
@@ -175,18 +181,16 @@ class BasePlugin:
                 self.IsInitalised = True
                 self.sendCommand(self.CMD_SET_RX)
         else:
-            if(self.RESPONSE_IRQ_RSSI in strData):
-                Domoticz.Debug("Serial Data: ["+strData+"]")
+            if(self.RESPONSE_MODE_RX in strData):
+                self.LastCommand = ""
+            elif(self.RESPONSE_IRQ in strData) and ((strData[16:17] == "3") or (strData[16:17] == "1")):
                 self.sendCommand(self.CMD_GET_LAST_RSSI)
-            elif(self.RESPONSE_IRQ_RX in strData):
-                Domoticz.Debug("Serial Data: ["+strData+"]")
-                self.sendCommand(self.CMD_GET_FIFO)
             elif(self.LastCommand == self.CMD_GET_LAST_RSSI):
                 self.LastRssi = int(strData, 16)
+                self.sendCommand(self.CMD_READ_BUFFER)
+            elif(self.LastCommand == self.CMD_READ_BUFFER):
                 Domoticz.Debug("Command Executed: ["+self.LastCommand+"] Response: ["+strData+"] Rssi: ["+ str(self.LastRssi) +"]")
-            elif(self.LastCommand == self.CMD_GET_FIFO):
-                Domoticz.Debug("Command Executed: ["+self.LastCommand+"] Response: ["+strData+"] ")
-                # Decode the fifo data
+                # Decode the buffer data
                 self.LastCommand = ""
                 self.decodeProcessFifoData(strData)
 

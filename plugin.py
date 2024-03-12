@@ -129,7 +129,7 @@ class BasePlugin:
 
         OpenThings.init(242)
         SerialConn = Domoticz.Connection(Name="Serial Connection", Transport="Serial",
-                                         Protocol="None", Address=Parameters["SerialPort"], Baud=115200)
+                                         Protocol="None", Address=Parameters["SerialPort"], Baud=230400)
         SerialConn.Connect()
 
     def onStop(self):
@@ -154,10 +154,9 @@ class BasePlugin:
         strData = Data.decode("ascii")
         strData = strData.replace("\n", "")
 
-        if(self.IsInitalised == False):
-            
-            Domoticz.Debug("Command Executed: ["+self.LastCommand+"] Response: ["+strData+"] ")
+        Domoticz.Debug("Command Executed: ["+self.LastCommand+"] Response: ["+strData+"] ")
 
+        if(self.IsInitalised == False):
             if(self.LastCommand.startswith(self.CMD_GET_FIRMWARE_VERSION)):
                 Domoticz.Log("Rfm Firmware Version: " + strData)
 
@@ -171,7 +170,7 @@ class BasePlugin:
 
                 self.CommandIndex = self.CommandIndex + 1
             else:
-                Domoticz.Debug("Initalised Rfm")
+                Domoticz.Debug("Initalised Rfm FSK")
                 self.LastCommand = ""
                 self.IsInitalised = True
                 self.sendCommand(self.CMD_SET_RX)

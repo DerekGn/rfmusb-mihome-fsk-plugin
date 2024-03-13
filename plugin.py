@@ -109,7 +109,7 @@ class BasePlugin:
         "s-dio 1 2",        # Set DIO 3 mapping to 1 for fifo not empty
         "s-dim 0x3",        # Set Irq mask to 3 
         "s-be 1",           # Enable buffered IO
-        #"s-rt",             # Set the receive threshold
+        "s-rt",             # Set the receive threshold
         "s-op"              # Set the output power
     ]
 
@@ -177,7 +177,7 @@ class BasePlugin:
                 Domoticz.Debug("Initalised Rfm FSK")
                 self.LastCommand = ""
                 self.IsInitalised = True
-                self.sendCommand(self.CMD_SET_RX)
+                self.send_command(self.CMD_SET_RX)
         else:
             if(self.RESPONSE_MODE_RX in strData):
                 self.LastCommand = ""
@@ -208,7 +208,7 @@ class BasePlugin:
         pass
 
     # Support functions
-    def twos_complement(hex, bits):
+    def twos_complement(self, hex, bits):
         value = int(hex, 16)
         if value & (1 << (bits - 1)):
             value -= 1 << bits
@@ -225,7 +225,7 @@ class BasePlugin:
             message = fifo[0:length + 1]
             Domoticz.Debug("Message: " + "".join("%02x" % b for b in message) + " Length: " + str(length))
             openthingsMessage = OpenThings.decode(message)
-            self.handleMessage(openthingsMessage)
+            self.handle_message(openthingsMessage)
         except OpenThings.OpenThingsException as error:
             errorMessage = str(error)
             Domoticz.Error("Unable to decode payload: " + errorMessage)
@@ -239,19 +239,19 @@ class BasePlugin:
 
         deviceId = Common.createDeviceId(productId, manufacturerId, sensorId)
         join = Common.findRecord(message, OpenThings.PARAM_JOIN)
-        deviceExists = self.deviceExists(deviceId)
+        deviceExists = self.device_exists(deviceId)
 
         if(join is not None):
             Domoticz.Debug("Join: " + str(join))
             if(not deviceExists):
                 Domoticz.Log("Join Message From DeviceId: [" + str(deviceId) + "]")
-                self.addDevice(manufacturerId, deviceId, productId)
+                self.add_device(manufacturerId, deviceId, productId)
             else:
                 Domoticz.Log("DeviceId: [" + str(deviceId) + "] Already Joined")
         else:
             if(deviceExists):
                 Domoticz.Debug("Updating DeviceId: [" + str(deviceId) + "]")
-                self.updateDevice(deviceId, manufacturerId, productId, message)
+                self.update_device(deviceId, manufacturerId, productId, message)
             else:
                 Domoticz.Log("DeviceId: [" + str(deviceId) + "] Not Found")
 
@@ -263,7 +263,7 @@ class BasePlugin:
         else:
             Domoticz.Error("Unknown Product Id: [" + str(productId) + "]")
 
-    def updateDevice(self, deviceId, manufacturerId, productId, message):
+    def update_device(self, deviceId, manufacturerId, productId, message):
         if(manufacturerId == Energine.MFRID_ENERGENIE):
             Energine.updateDevice(deviceId, Devices, productId, message, self.LastRssi)
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):

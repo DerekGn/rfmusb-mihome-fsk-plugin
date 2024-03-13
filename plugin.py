@@ -142,7 +142,7 @@ class BasePlugin:
                          Parameters["SerialPort"])
 
             self.SerialConn = Connection
-            self.sendCommand(self.CMD_GET_FIRMWARE_VERSION)
+            self.send_command(self.CMD_GET_FIRMWARE_VERSION)
         else:
             Domoticz.Log("Failed to connect ("+str(Status) +
                          ") to: "+Parameters["SerialPort"])
@@ -166,11 +166,11 @@ class BasePlugin:
 
             if(self.CommandIndex < len(self.InitCommands)):
                 if(self.InitCommands[self.CommandIndex].startswith(self.CMD_SET_RSSI_THRESHOLD)):
-                    self.sendCommand(self.CMD_SET_RSSI_THRESHOLD + " " + str(Parameters["Mode3"]))
+                    self.send_command(self.CMD_SET_RSSI_THRESHOLD + " " + str(Parameters["Mode3"]))
                 elif(self.InitCommands[self.CommandIndex].startswith(self.CMD_SET_OUTPUT_POWER)):
-                    self.sendCommand(self.CMD_SET_OUTPUT_POWER + " " + str(Parameters["Mode4"]))
+                    self.send_command(self.CMD_SET_OUTPUT_POWER + " " + str(Parameters["Mode4"]))
                 else:
-                    self.sendCommand(self.InitCommands[self.CommandIndex])
+                    self.send_command(self.InitCommands[self.CommandIndex])
 
                 self.CommandIndex = self.CommandIndex + 1
             else:
@@ -182,15 +182,15 @@ class BasePlugin:
             if(self.RESPONSE_MODE_RX in strData):
                 self.LastCommand = ""
             elif(self.RESPONSE_IRQ in strData) and ((strData[16:17] == "3") or (strData[16:17] == "1")):
-                self.sendCommand(self.CMD_GET_LAST_RSSI)
+                self.send_command(self.CMD_GET_LAST_RSSI)
             elif(self.LastCommand == self.CMD_GET_LAST_RSSI):
-                self.LastRssi = int(strData, 16)
-                self.sendCommand(self.CMD_READ_BUFFER)
+                self.LastRssi = self.twos_complement(strData[8:], 8)
+                self.send_command(self.CMD_READ_BUFFER)
             elif(self.LastCommand == self.CMD_READ_BUFFER):
                 Domoticz.Debug("Command Executed: ["+self.LastCommand+"] Response: ["+strData+"] Rssi: ["+ str(self.LastRssi) +"]")
                 # Decode the buffer data
                 self.LastCommand = ""
-                self.decodeProcessFifoData(strData)
+                self.decode_process_fifo_data(strData)
 
     def onCommand(self, Unit, Command, Level, Hue):
         Domoticz.Log("onCommand called for Unit " + str(Unit) +
@@ -208,11 +208,17 @@ class BasePlugin:
         pass
 
     # Support functions
-    def sendCommand(self, Command):
+    def twos_complement(hex, bits):
+        value = int(hex, 16)
+        if value & (1 << (bits - 1)):
+            value -= 1 << bits
+        return value
+
+    def send_command(self, Command):
         self.LastCommand = Command
         self.SerialConn.Send(Command + "\n")
 
-    def decodeProcessFifoData(self, data):
+    def decode_process_fifo_data(self, data):
         try:
             fifo = bytearray.fromhex(data)
             length = fifo[0]
@@ -224,7 +230,7 @@ class BasePlugin:
             errorMessage = str(error)
             Domoticz.Error("Unable to decode payload: " + errorMessage)
 
-    def handleMessage(self, message):
+    def handle_message(self, message):
         Domoticz.Debug(str(message))
         header = message["header"]
         sensorId = header["sensorid"]
@@ -249,7 +255,7 @@ class BasePlugin:
             else:
                 Domoticz.Log("DeviceId: [" + str(deviceId) + "] Not Found")
 
-    def addDevice(self, manufacturerId, deviceId, productId):
+    def add_device(self, manufacturerId, deviceId, productId):
         if(manufacturerId == Energine.MFRID_ENERGENIE):
             Energine.createDevice(deviceId, productId)
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
@@ -263,7 +269,7 @@ class BasePlugin:
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
             AxioLogix.updateDevice(deviceId, Devices, productId, message, self.LastRssi)
     
-    def deviceExists(self, deviceId):
+    def device_exists(self, deviceId):
         for x in Devices:
             if(Devices[x].DeviceID == deviceId):
                 return True

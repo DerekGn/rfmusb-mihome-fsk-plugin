@@ -27,7 +27,7 @@ PARAM_ECO2				= 0x05
 AIR_QUALITY_LEVEL_LIMIT = [1.9,2.9,3.9,4.9,5]
 AIR_QUALITY_LEVEL_CONDITION = ["None","Very Good","Good","Medium","Poor","Bad"]
 
-def createAqsSensor(deviceId):
+def create_aqs_sensor(deviceId):
     Domoticz.Log("Creating Aqs Sensor Id: " + deviceId)
     Domoticz.Unit(Name="IAQ", DeviceID=deviceId, Unit=IAQ_UNIT,
                   Type=Types.TYPE_GENERAL,
@@ -60,41 +60,41 @@ def createAqsSensor(deviceId):
                   Subtype=Types.DEVICE_SUB_TYPE_VOLTAGE,
                   Description="RfmAqs Sensor Battery Voltage").Create()
 
-def updateAqsSensor(deviceId, devices, message, rssi):
-    Domoticz.Log("Updating AQS Sensor Id: " + str(deviceId))
-    batteryVoltageRecord = Common.findRecord(message, PARAM_BATTERY_VOLTAGE)
-    humidityRecord = Common.findRecord(message, OpenThings.PARAM_RELATIVE_HUMIDITY)
-    batteryLevelRecord = Common.findRecord(message, OpenThings.PARAM_BATTERY_LEVEL)
-    temperatureRecord = Common.findRecord(message, OpenThings.PARAM_TEMPERATURE)
-    tvocRecord = Common.findRecord(message, PARAM_TVOC)
-    etohRecord = Common.findRecord(message, PARAM_ETOH)
-    eco2Record = Common.findRecord(message, PARAM_ECO2)
-    iaqRecord = Common.findRecord(message, PARAM_IAQ)
+def update_aqs_sensor(deviceId, devices, message, rssi):
+    Domoticz.Log("Updating AQS Sensor Id: [{0}]"
+                 .format(deviceId))
+    batteryVoltageRecord = Common.find_record(message, PARAM_BATTERY_VOLTAGE)
+    humidityRecord = Common.find_record(message, OpenThings.PARAM_RELATIVE_HUMIDITY)
+    batteryLevelRecord = Common.find_record(message, OpenThings.PARAM_BATTERY_LEVEL)
+    temperatureRecord = Common.find_record(message, OpenThings.PARAM_TEMPERATURE)
+    tvocRecord = Common.find_record(message, PARAM_TVOC)
+    etohRecord = Common.find_record(message, PARAM_ETOH)
+    eco2Record = Common.find_record(message, PARAM_ECO2)
+    iaqRecord = Common.find_record(message, PARAM_IAQ)
 
-    batteryVoltage = Common.roundRecordValue(batteryVoltageRecord, 2)
-    temperature = Common.roundRecordValue(temperatureRecord, 1)
-    humidity = Common.roundRecordValue(humidityRecord, 2)
-    batteryLevel = Common.roundRecordValue(batteryLevelRecord, 2)
-    iaq = Common.roundRecordValue(iaqRecord, 2)
-    tvoc = Common.roundRecordValue(tvocRecord, 2)
-    etoh = Common.roundRecordValue(etohRecord, 2)
-    eco2 = Common.roundRecordValue(eco2Record, 2)
+    batteryVoltage = Common.round_record_value(batteryVoltageRecord, 2)
+    temperature = Common.round_record_value(temperatureRecord, 1)
+    humidity = Common.round_record_value(humidityRecord, 2)
+    batteryLevel = Common.round_record_value(batteryLevelRecord, 2)
+    iaq = Common.round_record_value(iaqRecord, 2)
+    tvoc = Common.round_record_value(tvocRecord, 2)
+    etoh = Common.round_record_value(etohRecord, 2)
+    eco2 = Common.round_record_value(eco2Record, 2)
 
-    iaqLevel = calculateIAQLevel(iaq)
+    iaqLevel = calculate_IAQ_level(iaq)
     iaqtext = AIR_QUALITY_LEVEL_CONDITION[iaqLevel]
 
-    Domoticz.Debug("Updating AQS Sensor Id: [" + str(deviceId) + "] "
-                   "RSSI: [" + str(rssi) + "] " +
-                   "IAQ: [" + str(iaq) + "] " +
-                   "TVOC: [" + str(tvoc) + "] " +
-                   "ETOH: [" + str(etoh) + "] " +
-                   "ECO2: [" + str(eco2) + "] " +
-                   "IAQText: [" + iaqtext + "] " +
-                   "IAQLevel: [" + str(iaqLevel) + "] " +
-                   "Humidity: [" + str(humidity) + "] " +
-                   "Temperature: [" + str(temperature) + "] " +
-                   "Battery Level: [" + str(batteryLevel) + "] " +
-                   "Battery Voltage: [" + str(batteryVoltage) + "]")
+    Domoticz.Debug("Updating AQS Sensor Id: [{0}] "
+                   "RSSI: [{1}] IAQ: [{2}] " +
+                   "TVOC: [{3}] ETOH: [{4}] " +
+                   "ECO2: [{5}] IAQText: [{6}] " +
+                   "IAQLevel: [{7}] Humidity: [{8}] " +
+                   "Temperature: [{9}] Battery Level: [{10}] " +
+                   "Battery Voltage: [{11}]"
+                   .format(deviceId, str(rssi), str(iaq), str(tvoc), 
+                           str(etoh), str(eco2), iaqtext, str(iaqLevel), 
+                           str(humidity), str(temperature), str(batteryLevel),
+                           str(batteryVoltage)))
     
     device = device
     device.Units[IAQ_UNIT].nValue = iaq
@@ -139,7 +139,7 @@ def updateAqsSensor(deviceId, devices, message, rssi):
     device.Units[VBATT_UNIT].SignalLevel = rssi
     device.Units[VBATT_UNIT].Update(Log=True)
 
-def calculateIAQLevel(iaq):
+def calculate_IAQ_level(iaq):
     level = 0
 
     if iaq > 0 and iaq <= AIR_QUALITY_LEVEL_LIMIT[0]:

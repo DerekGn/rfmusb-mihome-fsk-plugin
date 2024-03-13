@@ -59,33 +59,36 @@ PRODUCTID_MIHO033 = 0x0D  # FSK: Open sensor
 CRYPT_PID = 242
 CRYPT_PIP = 0x0100
 
-def createDevice(deviceId, productId):
+def create_device(deviceId, productId):
     if(productId == PRODUCTID_MIHO032):
-        Domoticz.Log("Creating Motion Sensor Id: " + deviceId)
+        Domoticz.Log("Creating Motion Sensor Id: [{}]"
+                     .format(deviceId))
         Domoticz.Unit(Name="Motion Sensor", DeviceID=deviceId, Unit=1,
                         TypeName="Switch", Type=244, Subtype=73, Switchtype=8,
                         Description="MIHO032 Infra red Motion Sensor").Create()
     elif(productId == PRODUCTID_MIHO033):
-        Domoticz.Log("Creating Door Sensor Id: " + deviceId)
+        Domoticz.Log("Creating Door Sensor Id: [{}]"
+                     .format(deviceId))
         Domoticz.Unit(Name="Door Sensor", DeviceID=deviceId, Unit=1,
                         TypeName="Switch", Type=244, Subtype=73, Switchtype=11,
                         Description="MIHO033 Door Sensor").Create()
 
-def updateDevice(deviceId, devices, productId, message, rssi):
+def update_device(deviceId, devices, productId, message, rssi):
     if(Common.deviceAndUnitExists(devices, deviceId, 1)):
         if(productId == PRODUCTID_MIHO032):
             motionRecord = Common.findRecord(
                 message, OpenThings.PARAM_MOTION_DETECTOR)
             # TODO map 0 value
-            Domoticz.Debug("Updating Motion Sensor Id: " +
-                        str(deviceId) + str(motionRecord["value"]))
+            Domoticz.Debug("Updating Motion Sensor Id: [{0}] Status: [{1}]"
+                           .format(deviceId, str(motionRecord["value"])))
             
             devices[deviceId].Units[1].nValue = int(motionRecord["value"])
             devices[deviceId].Units[1].sValue = str(motionRecord["value"])
             devices[deviceId].Units[1].SignalLevel = rssi
             devices[deviceId].Units[1].Update(Log=True)
         elif(productId == PRODUCTID_MIHO033):
-            Domoticz.Debug("Updating Door Sensor Id: " + str(deviceId))
+            Domoticz.Debug("Updating Door Sensor Id: [{}]"
+                           .format(deviceId))
             doorRecord = Common.findRecord(message, OpenThings.PARAM_DOOR_SENSOR)
 
             devices[deviceId].Units[1].nValue = int(doorRecord["value"])
@@ -93,4 +96,4 @@ def updateDevice(deviceId, devices, productId, message, rssi):
             devices[deviceId].Units[1].SignalLevel = rssi
             devices[deviceId].Units[1].Update(Log=True)
     else:
-        Domoticz.Error("Unable to resolve Device Id: " + deviceId)
+        Domoticz.Error("Unable to resolve Device Id: []" + deviceId)

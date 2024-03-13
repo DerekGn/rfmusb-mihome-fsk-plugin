@@ -9,23 +9,23 @@ import AxioLogixAqs
 
 MFRID_AXIOLOGIX = 0x55
 
-def createDevice(deviceId, productId):
+def create_device(deviceId, productId):
     if(productId == AxioLogixTempHumidity.PRODUCTID_TEMPHUMIDITY):
-        AxioLogixTempHumidity.createTempHumiditySensor(deviceId)
+        AxioLogixTempHumidity.create_temperature_humidity_sensor(deviceId)
     elif(productId == AxioLogixAqs.PRODUCTID_AQS):
-        AxioLogixAqs.createAqsSensor(deviceId)
+        AxioLogixAqs.create_aqs_sensor(deviceId)
     elif(productId == AxioLogixEnergyMeter.PRODUCTID_EM):
-        AxioLogixEnergyMeter.createEnergyMeterSensor(deviceId)
+        AxioLogixEnergyMeter.create_energy_meter_sensor(deviceId)
 
-def updateDevice(deviceId, devices, productId, message, rssi):
+def update_device(deviceId, devices, productId, message, rssi):
     if(productId == AxioLogixTempHumidity.PRODUCTID_TEMPHUMIDITY):
-        AxioLogixTempHumidity.updateTemperatureHumiditySensor(deviceId, devices, message, rssi)
+        AxioLogixTempHumidity.update_temperature_humidity_sensor(deviceId, devices, message, rssi)
     elif(productId == AxioLogixAqs.PRODUCTID_AQS):
-        AxioLogixAqs.updateAqsSensor(deviceId, devices, message, rssi)
+        AxioLogixAqs.update_aqs_sensor(deviceId, devices, message, rssi)
     elif(productId == AxioLogixEnergyMeter.PRODUCTID_EM):
-        AxioLogixEnergyMeter.updateEnergyMeterSensor(deviceId, devices, message, rssi)
+        AxioLogixEnergyMeter.update_energy_meter_sensor(deviceId, devices, message, rssi)
 
-def findDeviceByType(devices, deviceType):
+def find_device_by_type(devices, deviceType):
     for x in devices:
         if(x.Type == deviceType):
             return x

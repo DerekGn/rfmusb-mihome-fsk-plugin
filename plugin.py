@@ -165,12 +165,10 @@ class BasePlugin:
                 Domoticz.Log("Rfm Firmware Version: " + strData)
 
             if(self.CommandIndex < len(self.InitCommands)):
-                # if(self.InitCommands[self.CommandIndex].startswith(self.CMD_SET_RSSI_THRESHOLD)):
-                #     self.sendCommand(self.CMD_SET_RSSI_THRESHOLD + " " + str(Parameters["Mode3"]))
-                # elif(self.InitCommands[self.CommandIndex].startswith(self.CMD_SET_OUTPUT_POWER)):
-                #     self.sendCommand(self.CMD_SET_OUTPUT_POWER + " " + str(Parameters["Mode4"]))
-                if(self.InitCommands[self.CommandIndex].startswith(self.CMD_SET_OUTPUT_POWER)):
-                     self.sendCommand(self.CMD_SET_OUTPUT_POWER + " " + str(Parameters["Mode4"]))
+                if(self.InitCommands[self.CommandIndex].startswith(self.CMD_SET_RSSI_THRESHOLD)):
+                    self.sendCommand(self.CMD_SET_RSSI_THRESHOLD + " " + str(Parameters["Mode3"]))
+                elif(self.InitCommands[self.CommandIndex].startswith(self.CMD_SET_OUTPUT_POWER)):
+                    self.sendCommand(self.CMD_SET_OUTPUT_POWER + " " + str(Parameters["Mode4"]))
                 else:
                     self.sendCommand(self.InitCommands[self.CommandIndex])
 

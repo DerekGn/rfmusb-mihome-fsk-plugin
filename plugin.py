@@ -109,7 +109,7 @@ class BasePlugin:
         "s-dio 1 2",        # Set DIO 3 mapping to 1 for fifo not empty
         "s-dim 0x3",        # Set Irq mask to 3 
         "s-be 1",           # Enable buffered IO
-        #"s-rt",             # Set the receive threshold
+        "s-rt",             # Set the receive threshold
         "s-op"              # Set the output power
     ]
 
@@ -134,21 +134,18 @@ class BasePlugin:
         SerialConn.Connect()
 
     def onStop(self):
-        Domoticz.Log("onStop called")
+        Domoticz.Debug("onStop called")
 
     def onConnect(self, Connection, Status, Description):
         if (Status == 0):
-            Domoticz.Log("Connected successfully to: " +
-                         Parameters["SerialPort"])
+            Domoticz.Status("Connected successfully to: {}"
+                            .format(Parameters["SerialPort"]))
 
             self.SerialConn = Connection
-            self.sendCommand(self.CMD_GET_FIRMWARE_VERSION)
+            self.send_command(self.CMD_GET_FIRMWARE_VERSION)
         else:
-            Domoticz.Log("Failed to connect ("+str(Status) +
-                         ") to: "+Parameters["SerialPort"])
-
-            Domoticz.Debug("Failed to connect ("+str(Status)+") to: " +
-                           Parameters["SerialPort"]+" with error: "+Description)
+            Domoticz.Error("Failed to connect to: {0} Status: {1} Description: {2}"
+                           .format(Parameters["SerialPort"], str(Status), Description))
         return True
 
     def onMessage(self, Connection, Data):
@@ -156,41 +153,47 @@ class BasePlugin:
         strData = strData.replace("\n", "")
 
         if(self.LastCommand != ""):
-            Domoticz.Debug("Command Executed: ["+self.LastCommand+"] Response: ["+strData+"]")
+            Domoticz.Debug("Command Executed: [{0}] Response: [{1}]"
+                           .format(self.LastCommand, strData))
         else:
-            Domoticz.Debug("Serial Data: ["+strData+"]")
+            Domoticz.Debug("Serial Data: [{}]"
+                           .format(strData))
             
         if(self.IsInitalised == False):
             if(self.LastCommand.startswith(self.CMD_GET_FIRMWARE_VERSION)):
-                Domoticz.Log("Rfm Firmware Version: " + strData)
+                Domoticz.Status("Rfm Firmware Version: {}"
+                                .format(strData))
 
             if(self.CommandIndex < len(self.InitCommands)):
                 if(self.InitCommands[self.CommandIndex].startswith(self.CMD_SET_RSSI_THRESHOLD)):
-                    self.sendCommand(self.CMD_SET_RSSI_THRESHOLD + " " + str(Parameters["Mode3"]))
+                    self.send_command(self.CMD_SET_RSSI_THRESHOLD + " " + str(Parameters["Mode3"]))
                 elif(self.InitCommands[self.CommandIndex].startswith(self.CMD_SET_OUTPUT_POWER)):
-                    self.sendCommand(self.CMD_SET_OUTPUT_POWER + " " + str(Parameters["Mode4"]))
+                    self.send_command(self.CMD_SET_OUTPUT_POWER + " " + str(Parameters["Mode4"]))
                 else:
-                    self.sendCommand(self.InitCommands[self.CommandIndex])
+                    self.send_command(self.InitCommands[self.CommandIndex])
 
                 self.CommandIndex = self.CommandIndex + 1
             else:
-                Domoticz.Debug("Initalised Rfm FSK")
+                Domoticz.Status("Initalised")
                 self.LastCommand = ""
                 self.IsInitalised = True
-                self.sendCommand(self.CMD_SET_RX)
+                self.send_command(self.CMD_SET_RX)
         else:
             if(self.RESPONSE_MODE_RX in strData):
                 self.LastCommand = ""
             elif(self.RESPONSE_IRQ in strData) and ((strData[16:17] == "3") or (strData[16:17] == "1")):
-                self.sendCommand(self.CMD_GET_LAST_RSSI)
+                self.send_command(self.CMD_GET_LAST_RSSI)
             elif(self.LastCommand == self.CMD_GET_LAST_RSSI):
-                self.LastRssi = int(strData, 16)
-                self.sendCommand(self.CMD_READ_BUFFER)
+                self.LastRssi = self.twos_complement(strData[8:], 8)
+                self.send_command(self.CMD_READ_BUFFER)
             elif(self.LastCommand == self.CMD_READ_BUFFER):
-                Domoticz.Debug("Command Executed: ["+self.LastCommand+"] Response: ["+strData+"] Rssi: ["+ str(self.LastRssi) +"]")
+                Domoticz.Debug("Command Executed: [{0}] Response: [{1}] Rssi: [{2}]"
+                               .format(self.LastCommand, strData, str(self.LastRssi)))
+                Domoticz.Status("Last Packet Rssi: {}"
+                                .format(self.LastRssi))
                 # Decode the buffer data
                 self.LastCommand = ""
-                self.decodeProcessFifoData(strData)
+                self.decode_process_fifo_data(strData)
 
     def onCommand(self, Unit, Command, Level, Hue):
         Domoticz.Log("onCommand called for Unit " + str(Unit) +
@@ -208,62 +211,76 @@ class BasePlugin:
         pass
 
     # Support functions
-    def sendCommand(self, Command):
+    def twos_complement(self, hex, bits):
+        value = int(hex, 16)
+        if value & (1 << (bits - 1)):
+            value -= 1 << bits
+        return value
+
+    def send_command(self, Command):
         self.LastCommand = Command
         self.SerialConn.Send(Command + "\n")
 
-    def decodeProcessFifoData(self, data):
+    def decode_process_fifo_data(self, data):
         try:
             fifo = bytearray.fromhex(data)
             length = fifo[0]
             message = fifo[0:length + 1]
-            Domoticz.Debug("Message: " + "".join("%02x" % b for b in message) + " Length: " + str(length))
+            Domoticz.Debug("Message: {0} Length: {1}"
+                           .format("".join("%02x" % b for b in message), str(length)))
             openthingsMessage = OpenThings.decode(message)
-            self.handleMessage(openthingsMessage)
+            self.handle_message(openthingsMessage)
         except OpenThings.OpenThingsException as error:
             errorMessage = str(error)
-            Domoticz.Error("Unable to decode payload: " + errorMessage)
+            Domoticz.Error("Unable to decode payload: {}"
+                           .format(errorMessage))
 
-    def handleMessage(self, message):
+    def handle_message(self, message):
         Domoticz.Debug(str(message))
         header = message["header"]
         sensorId = header["sensorid"]
         productId = header["productid"]
         manufacturerId = header["mfrid"]
 
-        deviceId = Common.createDeviceId(productId, manufacturerId, sensorId)
-        join = Common.findRecord(message, OpenThings.PARAM_JOIN)
-        deviceExists = self.deviceExists(deviceId)
+        deviceId = Common.create_device_id(productId, manufacturerId, sensorId)
+        join = Common.find_record(message, OpenThings.PARAM_JOIN)
+        deviceExists = self.device_exists(deviceId)
 
         if(join is not None):
-            Domoticz.Debug("Join: " + str(join))
+            Domoticz.Debug("Join: {}"
+                           .format(str(join)))
             if(not deviceExists):
-                Domoticz.Log("Join Message From DeviceId: [" + str(deviceId) + "]")
-                self.addDevice(manufacturerId, deviceId, productId)
+                Domoticz.Status("Join Message From DeviceId: [{}]"
+                             .format(deviceId))
+                self.add_device(manufacturerId, deviceId, productId)
             else:
-                Domoticz.Log("DeviceId: [" + str(deviceId) + "] Already Joined")
+                Domoticz.Status("DeviceId: [{}] Already Joined"
+                                .format(deviceId))
         else:
             if(deviceExists):
-                Domoticz.Debug("Updating DeviceId: [" + str(deviceId) + "]")
-                self.updateDevice(deviceId, manufacturerId, productId, message)
+                Domoticz.Status("Updating DeviceId: [{}]"
+                                .format(deviceId))
+                self.update_device(deviceId, manufacturerId, productId, message)
             else:
-                Domoticz.Log("DeviceId: [" + str(deviceId) + "] Not Found")
+                Domoticz.Status("DeviceId: [{}] not found"
+                                .format(deviceId))
 
-    def addDevice(self, manufacturerId, deviceId, productId):
+    def add_device(self, manufacturerId, deviceId, productId):
         if(manufacturerId == Energine.MFRID_ENERGENIE):
-            Energine.createDevice(deviceId, productId)
+            Energine.create_device(deviceId, productId)
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
-            AxioLogix.createDevice(deviceId, productId)
+            AxioLogix.create_device(deviceId, productId)
         else:
-            Domoticz.Error("Unknown Product Id: [" + str(productId) + "]")
+            Domoticz.Error("Unknown Product Id: [{}]"
+                           .format(str(productId)))
 
-    def updateDevice(self, deviceId, manufacturerId, productId, message):
+    def update_device(self, deviceId, manufacturerId, productId, message):
         if(manufacturerId == Energine.MFRID_ENERGENIE):
-            Energine.updateDevice(deviceId, Devices, productId, message, self.LastRssi)
+            Energine.update_device(deviceId, Devices, productId, message, self.LastRssi)
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
-            AxioLogix.updateDevice(deviceId, Devices, productId, message, self.LastRssi)
+            AxioLogix.update_device(deviceId, Devices, productId, message, self.LastRssi)
     
-    def deviceExists(self, deviceId):
+    def device_exists(self, deviceId):
         for x in Devices:
             if(Devices[x].DeviceID == deviceId):
                 return True
@@ -273,42 +290,34 @@ class BasePlugin:
 global _plugin
 _plugin = BasePlugin()
 
-
 def onStart():
     global _plugin
     _plugin.onStart()
-
 
 def onStop():
     global _plugin
     _plugin.onStop()
 
-
 def onConnect(Connection, Status, Description):
     global _plugin
     _plugin.onConnect(Connection, Status, Description)
-
 
 def onMessage(Connection, Data):
     global _plugin
     _plugin.onMessage(Connection, Data)
 
-
 def onCommand(Unit, Command, Level, Hue):
     global _plugin
     _plugin.onCommand(Unit, Command, Level, Hue)
-
 
 def onNotification(Name, Subject, Text, Status, Priority, Sound, ImageFile):
     global _plugin
     _plugin.onNotification(Name, Subject, Text, Status,
                            Priority, Sound, ImageFile)
 
-
 def onDisconnect(Connection):
     global _plugin
     _plugin.onDisconnect(Connection)
-
 
 def onHeartbeat():
     global _plugin

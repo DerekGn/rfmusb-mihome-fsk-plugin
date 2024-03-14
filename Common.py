@@ -5,11 +5,11 @@
 
 import DomoticzEx as Domoticz
 
-def deviceAndUnitExists(devices, deviceId, unitId):
+def device_and_unit_exists(devices, deviceId, unitId):
     return (devices[deviceId] is not None) \
         and (devices[deviceId].Units[unitId] is not None)
 
-def findRecord(message, id):
+def find_record(message, id):
     found = None
     for record in message["recs"]:
         if(record["paramid"] == id):
@@ -18,10 +18,10 @@ def findRecord(message, id):
             break
     return found
 
-def createDeviceId(productId, manufacturerId, sensorId):
+def create_device_id(productId, manufacturerId, sensorId):
     return str(productId) + ":" + str(manufacturerId) + ":" + str(sensorId)
 
-def roundRecordValue(record, rounding):
+def round_record_value(record, rounding):
     result = 0
     if("value" in record):
         result = round(record["value"], rounding)

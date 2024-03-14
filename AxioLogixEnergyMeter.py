@@ -179,56 +179,45 @@ def update_line_measurements(device, currentRecord, phaseRecord, activePowerReco
     # Current
     if(currentRecord["length"] != 0):
         device.Units[unitId].sValue=str(round(currentRecord["value"] / 1000.0, 3))
-    else:
-        device.Units[unitId].sValue="0"
-    device.Units[unitId].nValue=0
-    device.Units[unitId].SignalLevel = rssi
-    device.Units[unitId].Update()
+        device.Units[unitId].nValue=0
+        device.Units[unitId].SignalLevel = rssi
+        device.Units[unitId].Update()
     unitId += 1
     # Phase
     if(phaseRecord["length"] != 0):
         device.Units[unitId].sValue=str(round(phaseRecord["value"] / 10.0, 1))
-    else:
-        device.Units[unitId].sValue="0"    
-    device.Units[unitId].nValue=0
-    device.Units[unitId].SignalLevel = rssi
-    device.Units[unitId].Update()
+        device.Units[unitId].nValue=0
+        device.Units[unitId].SignalLevel = rssi
+        device.Units[unitId].Update()
     unitId += 1
     # Power Factor
     if(powerFactorRecord["length"] != 0):
         device.Units[unitId].sValue=str(round(powerFactorRecord["value"] / 1000.0, 3))
-    else:
-        device.Units[unitId].sValue="0"
-    device.Units[unitId].nValue=0
-    device.Units[unitId].SignalLevel = rssi
-    device.Units[unitId].Update()
+        device.Units[unitId].nValue=0
+        device.Units[unitId].SignalLevel = rssi
+        device.Units[unitId].Update()
     unitId += 1
     # Mean Active Power
     if(activePowerRecord["length"] != 0):
         device.Units[unitId].sValue=str(round(activePowerRecord["value"] / 1000.0, 3))
-    else:
-        device.Units[unitId].sValue="0"
-    device.Units[unitId].nValue=0
-    device.Units[unitId].SignalLevel = rssi
-    device.Units[unitId].Update()
+        device.Units[unitId].nValue=0
+        device.Units[unitId].SignalLevel = rssi
+        device.Units[unitId].Update()
     unitId += 1
     # Mean Reactive Power
     if(reactivePowerRecord["length"] != 0):
+        Domoticz.Log("Updating reactive")
         device.Units[unitId].sValue=str(round(reactivePowerRecord["value"] / 1000.0, 3))
-    else:
-        device.Units[unitId].sValue="0"
-    device.Units[unitId].nValue=0
-    device.Units[unitId].SignalLevel = rssi
-    device.Units[unitId].Update()
+        device.Units[unitId].nValue=0
+        device.Units[unitId].SignalLevel = rssi
+        device.Units[unitId].Update()
     unitId += 1
     # Apparent Power
     if(apparentPowerRecord["length"] != 0):
         device.Units[unitId].sValue=str(round(apparentPowerRecord["value"], 3))
-    else:
-        device.Units[unitId].sValue="0"
-    device.Units[unitId].nValue=0
-    device.Units[unitId].SignalLevel = rssi
-    device.Units[unitId].Update()
+        device.Units[unitId].nValue=0
+        device.Units[unitId].SignalLevel = rssi
+        device.Units[unitId].Update()
 
 def update_energy_measurements(device, message, unitId, rssi):
     # Absolute Active Energy

@@ -13,8 +13,12 @@ def find_record(message, id):
     found = None
     for record in message["recs"]:
         if(record["paramid"] == id):
-            Domoticz.Debug("Found record Id: {0} Length: {1} Value: {2}"
-                           .format(str(id), str(record["length"]), str(record["value"])))
+            if(record["length"] != 0):
+                Domoticz.Debug("Found record Id: {0} Length: {1} Value: {2}"
+                               .format(str(id), str(record["length"]), str(record["value"])))
+            else:
+                Domoticz.Debug("Found record Id: {0} Length: {1}"
+                               .format(str(id), str(record["length"])))    
             found = record
             break
     return found

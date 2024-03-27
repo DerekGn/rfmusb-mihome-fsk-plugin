@@ -211,6 +211,9 @@ class BasePlugin:
         pass
 
     # Support functions
+    def scale(self, val, src, dst):
+        return ((val - src[0]) / (src[1]-src[0])) * (dst[1]-dst[0]) + dst[0]
+    
     def twos_complement(self, hex, bits):
         value = int(hex, 16)
         if value & (1 << (bits - 1)):
@@ -275,10 +278,11 @@ class BasePlugin:
                            .format(str(productId)))
 
     def update_device(self, deviceId, manufacturerId, productId, message):
+        scaledRssi = self.scale(self.LastRssi, (-115, 0), (0, +11))
         if(manufacturerId == Energine.MFRID_ENERGENIE):
-            Energine.update_device(deviceId, Devices, productId, message, self.LastRssi)
+            Energine.update_device(deviceId, Devices, productId, message, scaledRssi)
         elif(manufacturerId == AxioLogix.MFRID_AXIOLOGIX):
-            AxioLogix.update_device(deviceId, Devices, productId, message, self.LastRssi)
+            AxioLogix.update_device(deviceId, Devices, productId, message, scaledRssi)
     
     def device_exists(self, deviceId):
         for x in Devices:
